@@ -35,7 +35,7 @@ def test_spi_communication(GPA_CS_MASK, GPB_CS_MASK, word, num_input_bits, num_o
 # Example usage
 GPA_CS_MASK = 0xFE
 GPB_CS_MASK = 0xFF
-word = 0xFF
+word = 0x1A
 num_input_bits = 6
 num_output_bits = 8
 
