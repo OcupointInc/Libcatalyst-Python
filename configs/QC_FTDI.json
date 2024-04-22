@@ -1,0 +1,8 @@
+{
+    "attenuator_cs": "D3",
+    "bypass_switch_gpio": "D4",
+    "v1_in_gpio": "D5",
+    "v2_in_gpio": "D6",
+    "v1_out_gpio": "D7",
+    "v2_out_gpio": "C0"
+}

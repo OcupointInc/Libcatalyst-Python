@@ -8,7 +8,7 @@ class HMC1018A(DigitalAttenuatorInterface):
         self.attenuation_steps = 1
         self.spi_interface = spi_interface
 
-    def set_attenuation(self, attenuation):
+    def set_attenuation_db(self, attenuation):
         if attenuation < 0 or attenuation > self.max_attenuation:
             raise ValueError(f"Attenuation must be between 0 and {self.max_attenuation} dB.")
         
@@ -19,10 +19,10 @@ class HMC1018A(DigitalAttenuatorInterface):
         spi_word = self.max_attenuation - attenuation
 
         # Write the SPI word to the digital attenuator
-        self.spi_interface.write(spi_word, self.num_bits)
+        self.spi_interface.write(2, spi_word, self.num_bits)
 
         return spi_word
     
-    def read_attenuation(self):
+    def set_attenuation_db(self):
         raise NotImplementedError("This device does not support readback functionality.")
     

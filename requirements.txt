@@ -1,2 +1,4 @@
 spidev
 pyftdi
+pyserial
+pytest
