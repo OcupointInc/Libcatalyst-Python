@@ -1,20 +1,7 @@
 # QC.py
 from sensors.digital_attenuators.ADRF5720 import ADRF5720
 from drivers.interface import DriverInterface
-from dataclasses import dataclass, field
-
-@dataclass
-class ChannelConfig:
-    attenuator_cs: str
-    attenuator_ps_gpio: str
-    bypass_switch_gpio: str
-    v1_in_gpio: str
-    v2_in_gpio: str
-    v1_out_gpio: str
-    v2_out_gpio: str
-
 from enum import Enum
-
 
 class QCBank(Enum):
     Bypass = 0
@@ -22,7 +9,7 @@ class QCBank(Enum):
     LPF_1GHz = 2
     LPF_2GHz = 3
 
-class QC:
+class QueensCanyon:
     def __init__(self, driver: DriverInterface):
         self.driver = driver
 
