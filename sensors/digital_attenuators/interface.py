@@ -9,7 +9,7 @@ class DigitalAttenuatorInterface(ABC):
         pass
 
     # Generate the SPI word with swapped bits
-    def set_attenuation_db(self):
+    def read_attenuation_db(self):
         """
         Read the attenuation of the digital attenuator.
         """
