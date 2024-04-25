@@ -60,6 +60,7 @@ class ADAR400X(DigitalAttenuatorInterface):
         """
         Set the time delay of the digital attenuator.
         """
+        print("setting time delay")
         if channel < 0 or channel > 3:
             raise ValueError(f"Channel must be between 0 and 3.")
         
