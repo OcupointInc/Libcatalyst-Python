@@ -3,5 +3,15 @@
     "MOSI": "GPIO10",
     "SCLK": "GPIO11",
     "MISO": "GPIO9",
-    "PSU": "USB0::10893::4098::MY59271741::0::INSTR"
+    "psu": {
+        "resource_id": "USB0::10893::4098::MY59271741::0::INSTR",
+        "channels": [
+            {
+                "voltage": 3.3,
+                "current_limit": 0.5,
+                "starting_current": 0.15,
+                "index": 1
+            }
+        ]
+    }
 }
