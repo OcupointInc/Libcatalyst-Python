@@ -2,5 +2,6 @@
     "CS": "GPIO8",
     "MOSI": "GPIO10",
     "SCLK": "GPIO11",
-    "MISO": "GPIO9"
+    "MISO": "GPIO9",
+    "PSU": "USB0::10893::4098::MY59271741::0::INSTR"
 }
