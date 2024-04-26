@@ -49,12 +49,12 @@ class LMX2595():
         )
 
         hex_settings = [f"0x{x:06x}" for x in spi_words]
-        print(hex_settings)
+        #print(hex_settings)
 
-        #for spi_word in spi_words:
-         #   self.driver.write_spi(self.cs, spi_word, 24) 
+        for spi_word in spi_words:
+           self.driver.write_spi(self.cs, spi_word, 24) 
         
         
         # self.driver.write_spi(self.cs, spi_word, self.num_bits)
-        pass
+        #pass
 
