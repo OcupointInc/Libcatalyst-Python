@@ -45,9 +45,9 @@ class DriverInterface(ABC):
     def write_gpio_pin(self, pin_name, value):
         pass
 
-    @abstractmethod
-    def get_pin_name(self, pin):
-        pass
+    #@abstractmethod
+    #def get_pin_name(self, pin):
+    #    pass
 
 class MockDriver(DriverInterface):
     def __init__(self, id, config_file):

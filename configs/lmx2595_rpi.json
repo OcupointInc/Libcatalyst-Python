@@ -1,4 +1,6 @@
 {
-    "input": "GPIO19",
-    "output": "GPIO26"
+    "CS": "GPIO8",
+    "MOSI": "GPIO10",
+    "SCLK": "GPIO11",
+    "MISO": "GPIO9"
 }
