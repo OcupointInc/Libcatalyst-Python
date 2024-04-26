@@ -11,10 +11,15 @@ class RaspberryPiDriver(DriverInterface):
             self.config = json.load(f)
         self.spi = spidev.SpiDev()  # Create a SPI device instance
         self.id = id
+        GPIO.setmode(GPIO.BCM)
 
     def _get_pin_number(self, name):
         """ Helper method to translate pin names to pin numbers. """
-        return self.config.get(name, -1)  # Return -1 if name is not found
+        # Retrieve the pin name string from the configuration
+        pin_string = self.config.get(name, -1)  # Return -1 if name is not found
+        if pin_string.startswith("GPIO") and pin_string[4:].isdigit():
+            # Extract and return the integer part after "GPIO"
+            return int(pin_string[4:])
 
     def write_spi(self, cs_name, data, num_bits):
         cs = self._get_pin_number(cs_name)
@@ -69,10 +74,15 @@ class RaspberryPiDriver(DriverInterface):
         print(f"GPIO Read: {pin}: {state}")
         return state
 
-    def write_gpio_pin(self, pin, pin_name):
+    def write_gpio_pin(self, pin_name, value):
         pin = self._get_pin_number(pin_name)
         GPIO.output(pin, value)
         print(f"GPIO Write: {pin}: {value}")
 
     def get_pin_name(self, pin_name):
-        return self.config.get("pin_names", {}).get(pin_name, "Unknown")
+        # Retrieve the pin name string from the configuration
+        pin_string = self.config.get("pin_names", {}).get(pin_name, "Unknown")
+        if pin_string.startswith("GPIO") and pin_string[4:].isdigit():
+            # Extract and return the integer part after "GPIO"
+            return int(pin_string[4:])
+        #return "Unknown"  # Return "Unknown" if the format is incorrect or the pin is not found

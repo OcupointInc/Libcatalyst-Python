@@ -21,7 +21,7 @@ class LogABCMeta(ABCMeta):
             new_namespace[name] = value
         return super().__new__(cls, name, bases, new_namespace)
 
-class DriverInterface(ABC, metaclass=LogABCMeta):
+class DriverInterface(ABC):
     @abstractmethod
     def write_spi(self, cs, data, num_bits):
         pass
@@ -42,7 +42,7 @@ class DriverInterface(ABC, metaclass=LogABCMeta):
         pass
 
     @abstractmethod
-    def write_gpio_pin(self, pin, value):
+    def write_gpio_pin(self, pin_name, value):
         pass
 
     @abstractmethod
@@ -75,7 +75,7 @@ class MockDriver(DriverInterface):
         print(f"GPIO Read: {pin}")
         return 0  # Return a mock value
 
-    def write_gpio_pin(self, pin, value):
+    def write_gpio_pin(self, pin_name, value):
         print(f"GPIO Write: {pin}: {value}")
 
     def get_pin_name(self, pin):
