@@ -18,7 +18,6 @@ class Keysight_e36311a:
             # Check to see if its already on
             if self.query_output_state(channel["index"]):
                 self.output_disable(channel["index"])
-                time.sleep(0.5)
 
             self.write_voltage(channel["index"], channel["voltage"])
             self.write_current(channel["index"], channel["current_limit"])
@@ -44,6 +43,8 @@ class Keysight_e36311a:
 
             if err:
                 sys.exit()
+
+            time.sleep(0.25)
 
 
 
