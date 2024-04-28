@@ -30,7 +30,7 @@ class DriverInterface(ABC):
     def read_spi(self, cs, num_bits):
         pass
 
-    def exchange_spi(self, cs, data, num_bits):
+    def exchange_spi(self, cs_name, write_data, write_bits, read_bits):
         pass
 
     @abstractmethod

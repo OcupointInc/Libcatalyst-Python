@@ -15,7 +15,7 @@ class MockDriver(DriverInterface):
         print(f"SPI Read {cs}: {data:#2x}")
         return data  # Return a mock value
 
-    def exchange_spi(self, cs, data, num_bits):
+    def exchange_spi(self, cs_name, write_data, write_bits, read_bits):
         print(f"SPI Exchange: {cs} {num_bits} bits: {data}")
         return 0  # Return a mock value
 
