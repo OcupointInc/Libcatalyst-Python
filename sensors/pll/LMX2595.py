@@ -103,6 +103,52 @@ class LMX2595():
         self.pfd_dly_sel = 1
         self.pll_n = 70
 
+    def read_register(self, reg_id):
+        # Set the most significant bit to 1 (read mode)
+        result = self.registers[reg_id] | 0x800000
+        
+        # Get the first two most significant bytes
+        first_two_msbs = (result & 0xFF0000) >> 16
+        return self.driver.exchange_spi("CS", first_two_msbs, 8, 16)
+
+    def set_readback_mode(self, value):
+        self.set_register_bit("R0", 2, value)
+
+    def set_power_down(self, value):
+        self.set_register_bit("R0", 0, value)
+
+    def read_is_locked(self):
+        data = self.read_register("R110")
+        
+        # Extract rb_LD_VTUNE (Bit 9, 10)
+        rb_LD_VTUNE = (data & 0x0600) >> 9
+        
+        # Extract rb_VCO_SEL (Bit 5, 6, 7)
+        rb_VCO_SEL = (data & 0x00E0) >> 5
+
+        is_locked = rb_LD_VTUNE == 2
+        
+        return is_locked, rb_VCO_SEL
+
+    def set_register_bit(self, register, bit_position, value):
+        if bit_position < 0 or bit_position > 23:
+            raise ValueError("Invalid bit position. It should be between 0 and 23.")
+
+        if value not in [0, 1]:
+            raise ValueError("Invalid bit value. It should be either 0 or 1.")
+
+        # Create a mask with the specific bit set to 1
+        mask = 1 << bit_position
+
+        if value == 1:
+            # Set the bit at the specified position
+            self.registers[register] |= mask
+        else:
+            # Clear the bit at the specified position
+            self.registers[register] &= ~mask
+
+        self.driver.write_spi(self.cs, self.registers[register], 24)
+
     def set_register_byte(self, register, bit_position, value):
         if bit_position < 0 or bit_position > 23:
             raise ValueError("Invalid bit position. It should be between 0 and 23.")

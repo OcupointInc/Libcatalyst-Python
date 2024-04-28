@@ -9,6 +9,7 @@ class RaspberryPiDriver(DriverInterface):
         with open(config_file, 'r') as f:
             self.config = json.load(f)
         GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
 
     def _get_pin_number(self, name):
         pin_string = self.config.get(name, -1)

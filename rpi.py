@@ -10,11 +10,14 @@ driver = RaspberryPiDriver(config)
 psu = Keysight_e36311a(config)
 
 pll = LMX2595(driver, "CS")
+#pll.set_readback_mode(1)
 pll.tune(12000)
-time.sleep(0.1)
-driver.exchange_spi("CS", 0xF0, 8, 16) # R112
-driver.exchange_spi("CS", 0xEF, 8, 16) # R111
-driver.exchange_spi("CS", 0xEE, 8, 16) # R110
-
+#pll.set_power_down(1)
+time.sleep(0.2)
+is_locked, vco = pll.read_is_locked()
+print(f"Pll Locked: {is_locked}. Tuned to VCO{vco}")
+print(f"Voltage: {psu.read_voltage(1)}v")
+print(f"Current: {psu.read_current(1)}a")
+#pll.read_register("R36")
 psu.output_disable(1)
 psu.close()
