@@ -22,22 +22,23 @@ def create_bit_mask(pin_name):
     return mask
 
 class FTDISPIDriver(DriverInterface):
-    def __init__(self, config_file, freq=1E6, id="ftdi://ftdi:ft232h/1"):
+    def __init__(self, config_file, freq=1E6, id="ftdi://ftdi:ft232h/1", debug=False):
         with open(config_file, 'r') as f:
             self.config = json.load(f)
         # Initialize the FTDI device in MPSSE mode
         self.ftdi = Ftdi()
+        self.debug = debug
         self.ftdi.open_mpsse(vendor=0x0403, product=0x6014)
         self.gpio = GpioMpsseController()
         self.freq = freq
         self.gpio.configure(id, direction=0xFFFF, frequency=freq)
 
-        # Set all of the pins to be high by default and store the state
-        self.current_state = 0xFFFF
+        # Set all of the pins to be high by default except the clock pin (idle low)
+        self.current_state = 0xFFFF & ~create_bit_mask("D0")
         self.gpio.write(self.current_state)
 
         # Calculate delay for SPI clock
-        self.half_period = 1 / (2 * freq)
+        self.half_period = 0
 
     def _get_pin(self, pin):
         return self.config[pin]
@@ -45,9 +46,16 @@ class FTDISPIDriver(DriverInterface):
     def read_spi(self, cs, num_bits):
         raise NotImplementedError("This device does not support read SPI functionality.")
     
+    def _int_to_bits(self, num, length):
+        # Convert integer to binary string, remove the '0b' prefix, and pad with leading zeros
+        binary_string = format(num, f'0{length}b')
+        # Convert binary string to a list of integers
+        bits_list = [int(bit) for bit in binary_string]
+        return bits_list
+
     def write_spi(self, cs, data, num_bits):
-        sclk_pin = self._get_pin("SCLK")
-        mosi_pin = self._get_pin("MOSI")
+        sclk_pin = "D0"
+        mosi_pin = "D1"
         cs_pin = self._get_pin(cs)
 
         sclk_mask = create_bit_mask(sclk_pin)
@@ -58,27 +66,36 @@ class FTDISPIDriver(DriverInterface):
         self.current_state &= ~cs_mask
         self.gpio.write(self.current_state)
 
-        for byte in data:
-            for i in range(8):  # Assuming 8 bits per byte
-                # Set MOSI
-                if byte & (0x80 >> i):
-                    self.current_state |= mosi_mask
-                else:
-                    self.current_state &= ~mosi_mask
-                
-                # Clock low
-                self.current_state &= ~sclk_mask
-                self.gpio.write(self.current_state)
-                time.sleep(self.half_period)
+        bits = self._int_to_bits(data, num_bits)
 
-                # Clock high
-                self.current_state |= sclk_mask
-                self.gpio.write(self.current_state)
-                time.sleep(self.half_period)
+        if self.debug:
+            print(hex(data))
+
+        for bit in bits:
+            # Set MOSI
+            if bit:
+                self.current_state |= mosi_mask
+            else:
+                self.current_state &= ~mosi_mask
+            
+            # Clock low (ensure idle state)
+            self.current_state &= ~sclk_mask
+            self.gpio.write(self.current_state)
+            time.sleep(self.half_period)
+
+            # Clock high
+            self.current_state |= sclk_mask
+            self.gpio.write(self.current_state)
+            time.sleep(self.half_period)
+
+            # Clock low again (back to idle state)
+            self.current_state &= ~sclk_mask
+            self.gpio.write(self.current_state)
 
         # Deactivate chip select (CS high)
         self.current_state |= cs_mask
         self.gpio.write(self.current_state)
+
     
     def exchange_spi(self, cs, data, num_bits):
         raise NotImplementedError("This device does not support exchange SPI functionality.")

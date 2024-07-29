@@ -1,0 +1,7 @@
+{
+    "CS_PLL_D": "D7",
+    "CS_PLL_A": "C1",
+    "CS_PLL_C": "C0",
+    "CS_PLL_B": "C2",
+    "PLL_D_MISO": "C3"
+}

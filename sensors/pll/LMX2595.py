@@ -128,36 +128,35 @@ class LMX2595():
     def set_PFD_DLY_SEL(self, freq_mhz):
         reg_id = "R37"
         bit_position = 8
-        match self.mash_order:
-            case 0:  # Integer mode
-                if freq_mhz % 200 != 0:
-                    print("Error, frequency should be divisible by 200")
-                elif freq_mhz <= 12500:
-                    self.set_register_byte(reg_id, bit_position, 0x01)
-                else:
-                    self.set_register_byte(reg_id, bit_position, 0x02)
-            case 1:
-                if freq_mhz <= 10000:
-                    self.set_register_byte(reg_id, bit_position, 0x01)
-                elif freq_mhz > 10000 and freq_mhz <= 12500:
-                    self.set_register_byte(reg_id, bit_position, 0x02)
-                elif freq_mhz > 12500:
-                    self.set_register_byte(reg_id, bit_position, 0x03)
-            case 2:
-                if freq_mhz <= 10000:
-                    self.set_register_byte(reg_id, bit_position, 0x02)
-                else:
-                    self.set_register_byte(reg_id, bit_position, 0x03)
-            case 3:
-                if freq_mhz <= 10000:
-                    self.set_register_byte(reg_id, bit_position, 0x03)
-                else:
-                    self.set_register_byte(reg_id, bit_position, 0x04)
-            case 4:
-                if freq_mhz <= 10000:
-                    self.set_register_byte(reg_id, bit_position, 0x05)
-                elif freq_mhz > 10000:
-                    self.set_register_byte(reg_id, bit_position, 0x06)
+        if self.mash_order == 0: # Integer mode
+            if freq_mhz % 200 != 0:
+                print("Error, frequency should be divisible by 200")
+            elif freq_mhz <= 12500:
+                self.set_register_byte(reg_id, bit_position, 0x01)
+            else:
+                self.set_register_byte(reg_id, bit_position, 0x02)
+        elif self.mash_order == 1:
+            if freq_mhz <= 10000:
+                self.set_register_byte(reg_id, bit_position, 0x01)
+            elif freq_mhz > 10000 and freq_mhz <= 12500:
+                self.set_register_byte(reg_id, bit_position, 0x02)
+            elif freq_mhz > 12500:
+                self.set_register_byte(reg_id, bit_position, 0x03)
+        elif self.mash_order == 2:
+            if freq_mhz <= 10000:
+                self.set_register_byte(reg_id, bit_position, 0x02)
+            else:
+                self.set_register_byte(reg_id, bit_position, 0x03)
+        elif self.mash_order == 3:
+            if freq_mhz <= 10000:
+                self.set_register_byte(reg_id, bit_position, 0x03)
+            else:
+                self.set_register_byte(reg_id, bit_position, 0x04)
+        elif self.mash_order == 4:
+            if freq_mhz <= 10000:
+                self.set_register_byte(reg_id, bit_position, 0x05)
+            elif freq_mhz > 10000:
+                self.set_register_byte(reg_id, bit_position, 0x06)
 
 
     def tune(self, freq_mhz):
