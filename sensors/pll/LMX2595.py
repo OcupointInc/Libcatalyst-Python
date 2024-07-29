@@ -1,7 +1,7 @@
 # rf_digital_attenuator.py
 import math
 
-registers={
+registers = {
     "R112": 0x700000,
     "R111": 0x6F0000,
     "R110": 0x6E0000,
@@ -86,11 +86,8 @@ registers={
     "R3": 0x030642,
     "R2": 0x020500,
     "R1": 0x010808,
-    "R0": 0x002518
+    "R0": 0x00251C
 }
-
-
-
 class LMX2595():
     def __init__(self, driver, cs):
         self.driver = driver
@@ -103,19 +100,29 @@ class LMX2595():
         self.pfd_dly_sel = 1
         self.pll_n = 70
 
-    def set_register_byte(self, register, bit_position, value):
-        if bit_position < 0 or bit_position > 23:
-            raise ValueError("Invalid bit position. It should be between 0 and 23.")
+    def set_register_bits_with_mask(self, register, mask, values):
+        # Ensure mask and values are within the valid range (24 bits)
+        if mask < 0 or mask > (1 << 24) - 1:
+            raise ValueError("Invalid mask value. It should be a 24-bit integer.")
         
-        if value < 0 or value > 15:
-            raise ValueError("Invalid bit value. It should be between 0 and 15.")
+        if values < 0 or values > (1 << 24) - 1:
+            raise ValueError("Invalid values. It should be a 24-bit integer.")
         
-        # Clear the bits at the specified position
-        mask = ~(0xF << bit_position)
-        cleared_value = self.registers[register] & mask
+        # Iterate over each bit position
+        for bit_position in range(24):
+            # Check if the bit in the mask is set
+            if mask & (1 << bit_position):
+                # Extract the corresponding bit from the values
+                bit_value = (values >> bit_position) & 1
+                
+                # Clear the bit at the specified position
+                bit_mask = ~(1 << bit_position)
+                cleared_value = self.registers[register] & bit_mask
+                
+                # Set the bit at the specified position with the given value
+                self.registers[register] = cleared_value | (bit_value << bit_position)
         
-        # Set the bits at the specified position with the given value
-        self.registers[register] = cleared_value | (value << bit_position)
+        # Write the updated value to the register
         self.driver.write_spi(self.cs, self.registers[register], 24)
 
     def set_PLL_N(self, freq_mhz):
@@ -124,40 +131,37 @@ class LMX2595():
         self.registers[reg_id] = 0x240000 + pll_n
         self.set_PFD_DLY_SEL(freq_mhz)
 
-
     def set_PFD_DLY_SEL(self, freq_mhz):
         reg_id = "R37"
-        bit_position = 8
         if self.mash_order == 0: # Integer mode
             if freq_mhz % 200 != 0:
                 print("Error, frequency should be divisible by 200")
             elif freq_mhz <= 12500:
-                self.set_register_byte(reg_id, bit_position, 0x01)
+                self.set_register_bits_with_mask(reg_id, 0xFF << 8, 0x01 << 8)
             else:
-                self.set_register_byte(reg_id, bit_position, 0x02)
+                self.set_register_bits_with_mask(reg_id, 0xFF << 8, 0x02 << 8)
         elif self.mash_order == 1:
             if freq_mhz <= 10000:
-                self.set_register_byte(reg_id, bit_position, 0x01)
+                self.set_register_bits_with_mask(reg_id, 0xFF << 8, 0x01 << 8)
             elif freq_mhz > 10000 and freq_mhz <= 12500:
-                self.set_register_byte(reg_id, bit_position, 0x02)
+                self.set_register_bits_with_mask(reg_id, 0xFF << 8, 0x02 << 8)
             elif freq_mhz > 12500:
-                self.set_register_byte(reg_id, bit_position, 0x03)
+                self.set_register_bits_with_mask(reg_id, 0xFF << 8, 0x03 << 8)
         elif self.mash_order == 2:
             if freq_mhz <= 10000:
-                self.set_register_byte(reg_id, bit_position, 0x02)
+                self.set_register_bits_with_mask(reg_id, 0xFF << 8, 0x02 << 8)
             else:
-                self.set_register_byte(reg_id, bit_position, 0x03)
+                self.set_register_bits_with_mask(reg_id, 0xFF << 8, 0x03 << 8)
         elif self.mash_order == 3:
             if freq_mhz <= 10000:
-                self.set_register_byte(reg_id, bit_position, 0x03)
+                self.set_register_bits_with_mask(reg_id, 0xFF << 8, 0x03 << 8)
             else:
-                self.set_register_byte(reg_id, bit_position, 0x04)
+                self.set_register_bits_with_mask(reg_id, 0xFF << 8, 0x04 << 8)
         elif self.mash_order == 4:
             if freq_mhz <= 10000:
-                self.set_register_byte(reg_id, bit_position, 0x05)
+                self.set_register_bits_with_mask(reg_id, 0xFF << 8, 0x05 << 8)
             elif freq_mhz > 10000:
-                self.set_register_byte(reg_id, bit_position, 0x06)
-
+                self.set_register_bits_with_mask(reg_id, 0xFF << 8, 0x06 << 8)
 
     def tune(self, freq_mhz):
         if freq_mhz > self.max_freq_mhz or freq_mhz < 0:
@@ -167,9 +171,10 @@ class LMX2595():
 
         # Write the data
         for spi_word in self.registers.values():
-           self.driver.write_spi(self.cs, spi_word, 24) 
-        
-        
-        # self.driver.write_spi(self.cs, spi_word, self.num_bits)
-        #pass
+           self.driver.write_spi(self.cs, spi_word, 24)
 
+    def power_down(self):
+        self.set_register_bits_with_mask("R0", 0x000001, 1)
+    
+    def power_up(self):
+        self.set_register_bits_with_mask("R0", 0x000001, 0)

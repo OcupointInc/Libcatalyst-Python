@@ -31,7 +31,17 @@ class FTDISPIDriver(DriverInterface):
         self.ftdi.open_mpsse(vendor=0x0403, product=0x6014)
         self.gpio = GpioMpsseController()
         self.freq = freq
-        self.gpio.configure(id, direction=0xFFFF, frequency=freq)
+
+        direction = 0xFFFF
+
+        # Make any miso pins an input
+        for key in self.config:
+            if "miso" in key.lower():
+                pin = pin_map[self._get_pin(key)]
+                mask = ~(1 << pin)
+                direction = direction & mask
+
+        self.gpio.configure(id, direction=direction, frequency=freq)
 
         # Set all of the pins to be high by default except the clock pin (idle low)
         self.current_state = 0xFFFF & ~create_bit_mask("D0")
@@ -52,6 +62,12 @@ class FTDISPIDriver(DriverInterface):
         # Convert binary string to a list of integers
         bits_list = [int(bit) for bit in binary_string]
         return bits_list
+    
+    def _int_to_hex_string(self,num, length):
+        # Calculate the number of hex digits needed for the specified bit length
+        hex_length = (length + 3) // 4  # Each hex digit represents 4 bits
+        # Convert integer to hexadecimal string and pad with leading zeros
+        return "0x" + format(num, f'0{hex_length}x')
 
     def write_spi(self, cs, data, num_bits):
         sclk_pin = "D0"
@@ -69,7 +85,7 @@ class FTDISPIDriver(DriverInterface):
         bits = self._int_to_bits(data, num_bits)
 
         if self.debug:
-            print(hex(data))
+            print(self._int_to_hex_string(data, num_bits))
 
         for bit in bits:
             # Set MOSI
@@ -94,6 +110,7 @@ class FTDISPIDriver(DriverInterface):
 
         # Deactivate chip select (CS high)
         self.current_state |= cs_mask
+        self.current_state |= mosi_mask
         self.gpio.write(self.current_state)
 
     
@@ -110,7 +127,7 @@ class FTDISPIDriver(DriverInterface):
 
     def read_gpio_pin(self, pin):
         mask = create_bit_mask(self._get_pin(pin))
-        pin_state = self.gpio.read() & mask
+        pin_state = self.gpio.read()[0] & mask
         return bool(pin_state)
     
     def write_gpio_pin(self, pin, value):
