@@ -1,14 +1,12 @@
 # QC Example.py
 import time
-from drivers.rpi_driver import RaspberryPiDriver
+from drivers.ftdi_driver import FTDISPIDriver
+from drivers.mock import MockDriver
 from sensors.pll.LMX2595 import LMX2595
 
-driver = RaspberryPiDriver("configs/lmx2595_rpi.json")
+driver = FTDISPIDriver("configs/lmx2595_FTDI.json", debug=True)
 
-pll = LMX2595(driver, "CS")
-pll.tune_pll(14000)
-# while True:
-#     pll.tune_pll(14000)
-#     time.sleep(1)
-#     pll.tune_pll(12000)
-#pll.tune_pll(14000)
+pll_d = LMX2595(driver, "CS_PLL_D")
+pll_d.tune(12000)
+time.sleep(0.1)
+print(driver.read_gpio_pin("PLL_D_MISO"))
