@@ -21,8 +21,6 @@ class HMC1018A(DigitalAttenuatorInterface):
 
         # Write the SPI word to the digital attenuator
         self.driver.write_spi(self.cs, spi_word, self.num_bits)
-
-        return spi_word
     
     def read_attenuation_db(self):
         raise NotImplementedError("This device does not support readback functionality.")
