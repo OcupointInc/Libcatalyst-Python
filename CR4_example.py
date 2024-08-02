@@ -12,10 +12,11 @@ with open('./PRF_Bypass.txt', 'r') as file:
 # Remove any whitespace or newline characters
 words = [word.strip() for word in words]
 
+
 # Write each 24-bit SPI word
 for word in words:
     # Assuming the word is a hexadecimal string and needs to be converted to an integer
     spi_word = int(word, 16)
     driver.write_spi("CS_PRF_IO", spi_word, 24)
     # Adding a small delay to ensure proper timing (adjust as needed)
-    time.sleep(0.0001)
+    #time.sleep(0.0001)

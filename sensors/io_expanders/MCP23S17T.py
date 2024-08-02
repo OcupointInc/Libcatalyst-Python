@@ -14,6 +14,10 @@ class MCP23S17T:
         self.driver = driver
         self.cs = cs
         self.device_address = device_address
+        self.bank_a_state = 0xFF  # Initialize bank A state
+        self.bank_b_state = 0xFF  # Initialize bank B state
+        self.bank_b_direction_state = 0x00
+        self.bank_a_direction_state = 0x00
         
     def _write_register(self, register, data):
         # Construct the control byte
@@ -26,11 +30,12 @@ class MCP23S17T:
         self.driver.write_spi(self.cs, message, 24)
     
     def write_spi(self, bank, data, cs_mask, mosi_pin, sclk_pin, num_bits):
-        # Set the bank direction to all outputs
-        self.set_bank_direction(bank, 0x00)
+        if bank == "A":
+            initial_state = self.bank_a_state & cs_mask
+        else:
+            initial_state = self.bank_b_state & cs_mask
         
-        # Prepare the initial state (CS high, SCLK low, MOSI low, unused pins high)
-        initial_state = 0xFF  # All pins high
+        # Prepare the initial state (CS high, SCLK low, MOSI low)
         initial_state &= ~sclk_pin  # SCLK low
         initial_state &= ~mosi_pin  # MOSI low
         self.write_bank_state(bank, initial_state)
@@ -54,8 +59,6 @@ class MCP23S17T:
         # Pull CS high to end transmission
         self.write_bank_state(bank, initial_state)
 
-
-
     def set_bank_direction(self, bank, direction):
         """
         Sets the I/O direction for the specified bank (A or B).
@@ -75,10 +78,18 @@ class MCP23S17T:
         self._write_register(register, direction)
 
     def write_bank_state(self, bank, state):
+        """
+        Writes the state to the specified bank (A or B) and updates the stored state.
+        
+        :param bank: 'A' or 'B'
+        :param state: 8-bit value representing the state of the bank
+        """
         if bank.upper() == 'A':
             register = self.GPIOA
+            self.bank_a_state = state  # Update stored state for bank A
         elif bank.upper() == 'B':
             register = self.GPIOB
+            self.bank_b_state = state  # Update stored state for bank B
         else:
             raise ValueError("Invalid bank. Use 'A' or 'B'.")
         

@@ -1,5 +1,5 @@
 {
-    "attenuator_cs": "D3",
+    "attenuator_cs": "D7",
     "attenuator_mosi": "D1",
     "attenuator_sclk": "D0",
     "bypass_switch_gpio": "D4",

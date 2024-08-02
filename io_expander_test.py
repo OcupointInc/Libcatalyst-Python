@@ -5,17 +5,34 @@ from drivers.mock import MockDriver
 from devices.cr4_v4r4 import CR4V4R4
 from sensors.rf_filters.ADMV8818 import ADMV8818
 from sensors.io_expanders.MCP23S17T import MCP23S17T
-driver = MockDriver("configs/CR4_V4_FTDI.json")
+driver = FTDISPIDriver("configs/CR4_V4_FTDI.json", debug=True)
 
 io = MCP23S17T(driver, "CS_PRF_IO")
 
 filt = ADMV8818(driver, "CS_PRF_IO")
-#data = filt.set_switches(1,2)
 
-#print(hex(data))
+cr4 = CR4V4R4(driver)
 
-io.set_bank_direction("A", 0xFF)
-io.set_bank_direction("B", 0x1E)
-io.write_bank_state("A", 0x0F)
-io.write_spi("B", 0x02112, 0x30, 0x08, 0x04, 24)
-io.write_spi("B", 0x020ca, 0x30, 0x08, 0x04, 24)
+cr4.set_attenuation_db([1,2,3,4], 16)
+#exit()
+
+# Sets all pins other than the SFL pins for the 8818 high
+cr4.io_expander.write_bank_state("A", 0x0F)
+MOSI_pin = 0x08
+SCLK_pin = 0x04
+num_bits = 24
+cs_mask = 0x30
+
+#cr4.io_expander.write_bank_state("A", 0xC0)
+cr4.io_expander.write_spi("B", 0x00081, cs_mask, MOSI_pin, SCLK_pin, num_bits)
+cr4.io_expander.write_spi("B", 0x0003C, cs_mask, MOSI_pin, SCLK_pin, num_bits)
+#print()
+cr4.io_expander.write_spi("B", 0x0020c0, cs_mask, MOSI_pin, SCLK_pin, num_bits)
+cr4.io_expander.write_spi("B", 0x00210f, cs_mask, MOSI_pin, SCLK_pin, num_bits)
+#print()
+
+#io.write_spi("B", 0x0210f, cs_mask, MOSI_pin, SCLK_pin, num_bits)
+
+
+#cr4.io_expander.write_bank_state("A", 0xFF)
+

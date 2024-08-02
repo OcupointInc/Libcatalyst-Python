@@ -15,6 +15,8 @@ class CR4V4R4:
         }
 
         self.io_expander = MCP23S17T(self.driver, "CS_PRF_IO")
+        self.io_expander.set_bank_direction("A", 0x00)
+        self.io_expander.set_bank_direction("B", 0xC3)
 
     def set_attenuation_db(self, channels, attenuation):
         """

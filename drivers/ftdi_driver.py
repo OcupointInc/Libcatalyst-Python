@@ -22,13 +22,13 @@ def create_bit_mask(pin_name):
     return mask
 
 class FTDISPIDriver(DriverInterface):
-    def __init__(self, config_file, freq=1E6, id="ftdi://ftdi:ft232h/1", debug=False):
+    def __init__(self, config_file, freq=1E7, id="ftdi://ftdi:ft232h/1", debug=False):
         with open(config_file, 'r') as f:
             self.config = json.load(f)
         # Initialize the FTDI device in MPSSE mode
         self.ftdi = Ftdi()
         self.debug = debug
-        self.ftdi.open_mpsse(vendor=0x0403, product=0x6014)
+        self.ftdi.open_mpsse(vendor=0x0403, product=0x6014, initial=0x0)
         self.gpio = GpioMpsseController()
         self.freq = freq
 
@@ -45,7 +45,8 @@ class FTDISPIDriver(DriverInterface):
 
         # Set all of the pins to be high by default except the clock pin (idle low)
         self.current_state = 0xFFFF & ~create_bit_mask("D0")
-        self.gpio.write(self.current_state)
+        #self.current_state = 0x0000
+        #self.gpio.write(self.current_state)
 
         # Calculate delay for SPI clock
         self.half_period = 0
@@ -78,6 +79,10 @@ class FTDISPIDriver(DriverInterface):
         mosi_mask = create_bit_mask(mosi_pin)
         cs_mask = create_bit_mask(cs_pin)
 
+        # Ensure SCLK and MOSI are low before starting
+        self.current_state &= ~(sclk_mask)
+        self.gpio.write(self.current_state)
+
         # Activate chip select (CS low)
         self.current_state &= ~cs_mask
         self.gpio.write(self.current_state)
@@ -94,15 +99,12 @@ class FTDISPIDriver(DriverInterface):
             else:
                 self.current_state &= ~mosi_mask
             
-            # Clock low (ensure idle state)
-            self.current_state &= ~sclk_mask
+            # Write MOSI state (clock is already low)
             self.gpio.write(self.current_state)
-            time.sleep(self.half_period)
 
             # Clock high
             self.current_state |= sclk_mask
             self.gpio.write(self.current_state)
-            time.sleep(self.half_period)
 
             # Clock low again (back to idle state)
             self.current_state &= ~sclk_mask
@@ -110,7 +112,10 @@ class FTDISPIDriver(DriverInterface):
 
         # Deactivate chip select (CS high)
         self.current_state |= cs_mask
-        self.current_state |= mosi_mask
+        self.gpio.write(self.current_state)
+
+        # Reset MOSI and SCLK to low after transmission
+        self.current_state &= ~(sclk_mask)
         self.gpio.write(self.current_state)
 
     
