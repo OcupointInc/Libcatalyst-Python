@@ -7,5 +7,15 @@
     "SW_AB": "D6",
     "SW_CD": "C5",
     "CS_PRF_IO": "D4",
-    "CS": "D3"
+    "CS": "D3",
+    "psu": {
+        "resource_id": "ASRL/dev/ttyUSB0::INSTR",
+        "channels": [
+            {
+                "index": 0,
+                "voltage": 5,
+                "current_limit": 5
+            }
+        ]
+    }
 }

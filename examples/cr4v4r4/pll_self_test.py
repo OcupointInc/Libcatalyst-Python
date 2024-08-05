@@ -8,6 +8,9 @@ sys.path.append(parent)
 from drivers.ftdi_driver import FTDISPIDriver
 from sensors.pll.LMX2595 import LMX2595
 from devices.cr4_v4r4 import CR4V4R4
+from devices.keysight_e36311a import Keysight_e36311a
+
+power_supply = Keysight_e36311a("configs/CR4_V4_FTDI.json")
 
 driver = FTDISPIDriver("configs/CR4_V4_FTDI.json", debug=False)
 cr4 = CR4V4R4(driver)

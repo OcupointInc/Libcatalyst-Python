@@ -28,7 +28,6 @@ class FTDISPIDriver(DriverInterface):
         # Initialize the FTDI device in MPSSE mode
         self.ftdi = Ftdi()
         self.debug = debug
-        print(Ftdi.list_devices())
         self.ftdi.open_mpsse(vendor=0x0403, product=0x6014, initial=0x0)
         self.gpio = GpioMpsseController()
         self.freq = freq

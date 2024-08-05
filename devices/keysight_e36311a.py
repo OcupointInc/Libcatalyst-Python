@@ -8,9 +8,15 @@ class Keysight_e36311a:
         self.rm = pyvisa.ResourceManager()
         with open(config_file, 'r') as f:
             self.config = json.load(f)
-        self.psu = self.rm.open_resource(self.config["psu"]["resource_id"])
+        self.psu = self.rm.open_resource(self.config["psu"]["resource_id"], timeout=10000)
+        
         self.channels = 3
+        print(self.get_device_id())
         self._setup()
+
+
+    def get_device_id(self):
+        return self.psu.query("*IDN?").strip()
 
     def _setup(self):
         # Initalize all of the channels
