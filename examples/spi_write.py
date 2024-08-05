@@ -1,12 +1,17 @@
-# QC Example.py
-import time
+
+import sys
+import os
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(os.path.dirname(current))
+sys.path.append(parent)
+
 from drivers.ftdi_driver import FTDISPIDriver
 
 # Initialize the FTDI SPI Driver
 driver = FTDISPIDriver("configs/CR4_V4_FTDI.json", debug=False)
 
 # Read SPI words from the file
-with open('./PRF_Bypass.txt', 'r') as file:
+with open('./spi_words.txt', 'r') as file:
     words = file.readlines()
 
 # Remove any whitespace or newline characters
@@ -18,5 +23,3 @@ for word in words:
     # Assuming the word is a hexadecimal string and needs to be converted to an integer
     spi_word = int(word, 16)
     driver.write_spi("CS_PRF_IO", spi_word, 24)
-    # Adding a small delay to ensure proper timing (adjust as needed)
-    #time.sleep(0.0001)

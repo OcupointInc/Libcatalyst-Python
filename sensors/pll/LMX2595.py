@@ -125,6 +125,10 @@ class LMX2595():
         # Write the updated value to the register
         self.driver.write_spi(self.cs, self.registers[register], 24)
 
+    def reset(self):
+        self.set_register_bits_with_mask("R0", 0x02, 0x02)
+        self.set_register_bits_with_mask("R0", 0x02, 0x00)
+
     def set_PLL_N(self, freq_mhz):
         reg_id = "R36"
         pll_n = math.floor(freq_mhz / 200)

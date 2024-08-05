@@ -13,6 +13,11 @@ filt = ADMV8818(driver, "CS_PRF_IO")
 
 cr4 = CR4V4R4(driver)
 
+driver.write_spi("CS", 0x00081, 24)
+driver.write_spi("CS", 0x0020c0, 24)
+driver.write_spi("CS", 0x00210f, 24)
+exit()
+
 cr4.set_attenuation_db([1,2,3,4], 16)
 #exit()
 

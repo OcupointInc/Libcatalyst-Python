@@ -18,6 +18,23 @@ class CR4V4R4:
         self.io_expander.set_bank_direction("A", 0x00)
         self.io_expander.set_bank_direction("B", 0xC3)
 
+    def set_switch(self, name, state):
+        #if state != "single" or state != "dual":
+        #    raise ValueError("State needs to be single or dual")
+        
+        if name == "AB" or name == "CD":
+            value = 0
+
+            if state == "dual":
+                value = 1
+
+            self.driver.write_gpio_pin(f"SW_{name}", value)
+        else:
+            raise ValueError("Switch name needs to be AB or CD")
+        
+
+
+
     def set_attenuation_db(self, channels, attenuation):
         """
         Sets the attenuation in dB.
@@ -46,3 +63,9 @@ class CR4V4R4:
 
     def power_up_pll(self, pll_name):
         self.plls[pll_name].power_up()
+
+    def reset_pll(self, pll_name):
+        self.plls[pll_name].reset()
+
+    def read_is_locked(self):
+        return self.driver.read_gpio_pin("PLL_MISO")
