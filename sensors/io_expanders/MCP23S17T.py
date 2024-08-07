@@ -1,5 +1,3 @@
-# IO_expander.py
-
 class MCP23S17T:
     # Device opcode
     OPCODE = 0x40
@@ -10,14 +8,18 @@ class MCP23S17T:
     GPIOA = 0x12   # GPIO register for bank A
     GPIOB = 0x13   # GPIO register for bank B
 
-    def __init__(self, driver, cs, device_address=0x00):
+    def __init__(self, driver, cs, device_address=0x00, mosi_pin=0x08, sclk_pin=0x04, cs_mask=0x30, spi_bank='B'):
         self.driver = driver
         self.cs = cs
         self.device_address = device_address
+        self.mosi_pin = mosi_pin
+        self.sclk_pin = sclk_pin
+        self.cs_mask = cs_mask
+        self.spi_bank = spi_bank
         self.bank_a_state = 0xFF  # Initialize bank A state
         self.bank_b_state = 0xFF  # Initialize bank B state
-        self.bank_b_direction_state = 0x00
-        self.bank_a_direction_state = 0x00
+        self.bank_a_direction = 0xFF  # Initialize bank A direction (all inputs)
+        self.bank_b_direction = 0xFF  # Initialize bank B direction (all inputs)
         
     def _write_register(self, register, data):
         # Construct the control byte
@@ -29,68 +31,89 @@ class MCP23S17T:
         # Write the data using SPI
         self.driver.write_spi(self.cs, message, 24)
     
-    def write_spi(self, bank, data, cs_mask, mosi_pin, sclk_pin, num_bits):
-        if bank == "A":
-            initial_state = self.bank_a_state & cs_mask
-        else:
-            initial_state = self.bank_b_state & cs_mask
-        
-        # Prepare the initial state (CS high, SCLK low, MOSI low)
-        initial_state &= ~sclk_pin  # SCLK low
-        initial_state &= ~mosi_pin  # MOSI low
-        self.write_bank_state(bank, initial_state)
-        
-        # Pull CS low to start transmission
-        current_state = initial_state & ~cs_mask
-        self.write_bank_state(bank, current_state)
-        
-        # Bit-bang the data
-        for i in range(num_bits):
-            bit = (data >> (num_bits - 1 - i)) & 1
-            
-            # Set MOSI and clock high
-            current_state = (current_state & ~mosi_pin) | (mosi_pin if bit else 0) | sclk_pin
-            self.write_bank_state(bank, current_state)
-            
-            # Clock low
-            current_state &= ~sclk_pin
-            self.write_bank_state(bank, current_state)
-        
-        # Pull CS high to end transmission
-        self.write_bank_state(bank, initial_state)
-
     def set_bank_direction(self, bank, direction):
-        """
-        Sets the I/O direction for the specified bank (A or B).
-        
-        :param bank: 'A' or 'B'
-        :param direction: 8-bit value where:
-                          1 = pin is configured as an input
-                          0 = pin is configured as an output
-        """
         if bank.upper() == 'A':
             register = self.IODIRA
+            self.bank_a_direction = direction
         elif bank.upper() == 'B':
             register = self.IODIRB
+            self.bank_b_direction = direction
         else:
             raise ValueError("Invalid bank. Use 'A' or 'B'.")
         
         self._write_register(register, direction)
 
     def write_bank_state(self, bank, state):
-        """
-        Writes the state to the specified bank (A or B) and updates the stored state.
-        
-        :param bank: 'A' or 'B'
-        :param state: 8-bit value representing the state of the bank
-        """
         if bank.upper() == 'A':
             register = self.GPIOA
-            self.bank_a_state = state  # Update stored state for bank A
+            self.bank_a_state = state
         elif bank.upper() == 'B':
             register = self.GPIOB
-            self.bank_b_state = state  # Update stored state for bank B
+            self.bank_b_state = state
         else:
             raise ValueError("Invalid bank. Use 'A' or 'B'.")
         
         self._write_register(register, state)
+
+    def write_spi(self, cs, data, num_bits):
+        bank_state = self.bank_b_state if self.spi_bank.upper() == 'B' else self.bank_a_state
+        
+        initial_state = bank_state | self.cs_mask  # CS high
+        initial_state &= ~self.sclk_pin  # SCLK low
+        initial_state &= ~self.mosi_pin  # MOSI low
+        self.write_bank_state(self.spi_bank, initial_state)
+        
+        # Pull CS low to start transmission
+        current_state = initial_state & ~self.cs_mask
+        self.write_bank_state(self.spi_bank, current_state)
+        
+        # Bit-bang the data
+        for i in range(num_bits):
+            bit = (data >> (num_bits - 1 - i)) & 1
+            
+            # Set MOSI for the current bit while clock is low
+            if bit:
+                current_state |= self.mosi_pin
+            else:
+                current_state &= ~self.mosi_pin
+            self.write_bank_state(self.spi_bank, current_state)
+            
+            # Set clock high
+            current_state |= self.sclk_pin
+            self.write_bank_state(self.spi_bank, current_state)
+            
+            # Set clock low
+            current_state &= ~self.sclk_pin
+            self.write_bank_state(self.spi_bank, current_state)
+        
+        # Pull CS high to end transmission
+        current_state |= self.cs_mask
+        self.write_bank_state(self.spi_bank, current_state)
+        
+        # Reset MOSI and SCLK to low after transmission
+        current_state &= ~self.mosi_pin
+        current_state &= ~self.sclk_pin
+        self.write_bank_state(self.spi_bank, current_state)
+
+    # Implement other DriverInterface methods as needed
+    def read_spi(self, cs, num_bits):
+        raise NotImplementedError("This device does not support read SPI functionality.")
+
+    def exchange_spi(self, cs, data, num_bits):
+        raise NotImplementedError("This device does not support exchange SPI functionality.")
+
+    def set_gpio_direction(self, pin, value):
+        # Implement if needed
+        pass
+
+    def read_gpio_pin(self, pin):
+        # Implement if needed
+        pass
+
+    def write_gpio_pin(self, pin, value):
+        # Implement if needed
+        pass
+
+    def close(self):
+        # Implement if needed
+        pass

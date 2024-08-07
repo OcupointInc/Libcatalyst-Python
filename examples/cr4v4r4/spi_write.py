@@ -1,6 +1,7 @@
 
 import sys
 import os
+import time
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(os.path.dirname(current))
 sys.path.append(parent)
@@ -8,10 +9,10 @@ sys.path.append(parent)
 from drivers.ftdi_driver import FTDISPIDriver
 
 # Initialize the FTDI SPI Driver
-driver = FTDISPIDriver("configs/CR4_V4_FTDI.json", debug=False)
+driver = FTDISPIDriver("configs/CR4_V4_FTDI.json", debug=True)
 
 # Read SPI words from the file
-with open('./spi_words.txt', 'r') as file:
+with open('./examples/cr4v4r4/spi_words.txt', 'r') as file:
     words = file.readlines()
 
 # Remove any whitespace or newline characters
