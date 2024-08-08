@@ -6,7 +6,6 @@ parent = os.path.dirname(os.path.dirname(current))
 sys.path.append(parent)
 
 from drivers.ftdi_driver import FTDISPIDriver
-from sensors.pll.LMX2595 import LMX2595
 from devices.cr4_v4r4 import CR4V4R4
 
 driver = FTDISPIDriver("configs/CR4_V4_FTDI.json", debug=False)
@@ -25,7 +24,7 @@ cr4.tune_pll("B", single_convert_freq_mhz)
 cr4.set_switch("AB", "single")
 cr4.set_switch("CD", "single")
 
-input("Tuned single convert to 12GHz.")
+input("Tuned single convert to 12GHz LO. Set RF to 9GHz and IF will be at 3GHz")
 
 single_convert_freq_mhz = 14000
 dual_convert_freq_mhz = 12000
@@ -36,4 +35,4 @@ cr4.tune_pll("C", dual_convert_freq_mhz)
 cr4.tune_pll("A", dual_convert_freq_mhz)
 cr4.set_switch("AB", "dual")
 cr4.set_switch("CD", "dual")
-input("Tuned dual convert to 12GHz and 14GHz")
+input("Tuned dual convert to 12GHz and 14GHz. Set RF to 5GHz and If will be at 3GHz")
