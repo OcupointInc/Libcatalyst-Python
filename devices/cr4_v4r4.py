@@ -22,6 +22,9 @@ class CR4V4R4:
         self.io_expander.set_bank_direction("A", 0x00)
         self.io_expander.set_bank_direction("B", 0xC3)
 
+        for pll in self.plls.values():
+            pll.reset()
+
     def set_switch(self, name, state):
         #if state != "single" or state != "dual":
         #    raise ValueError("State needs to be single or dual")

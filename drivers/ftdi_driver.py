@@ -1,6 +1,7 @@
 # ftdi_driver.py
 from pyftdi.ftdi import Ftdi
 from pyftdi.gpio import GpioMpsseController
+from pyftdi.spi import SpiController
 from .interface import DriverInterface
 import json
 import time
@@ -22,7 +23,7 @@ def create_bit_mask(pin_name):
     return mask
 
 class FTDISPIDriver(DriverInterface):
-    def __init__(self, config_file, freq=1E7, id="ftdi://ftdi:ft232h/1", debug=False):
+    def __init__(self, config_file, freq=3E7, id="ftdi://ftdi:ft232h/1", debug=False):
         with open(config_file, 'r') as f:
             self.config = json.load(f)
         # Initialize the FTDI device in MPSSE mode
@@ -30,6 +31,9 @@ class FTDISPIDriver(DriverInterface):
         self.debug = debug
         self.ftdi.open_mpsse(vendor=0x0403, product=0x6014, direction=0x0, initial=0x0)
         self.gpio = GpioMpsseController()
+        self.spi = SpiController()
+        self.spi.configure(id)
+        self.slave = self.spi.get_port(0, freq, 0)
         self.freq = freq
 
         direction = 0xFFFF
@@ -71,55 +75,27 @@ class FTDISPIDriver(DriverInterface):
         return "0x" + format(num, f'0{hex_length}x').upper()
 
     def write_spi(self, cs, data, num_bits):
-        sclk_pin = "D0"
-        mosi_pin = "D1"
         cs_pin = self._get_pin(cs)
-
-        sclk_mask = create_bit_mask(sclk_pin)
-        mosi_mask = create_bit_mask(mosi_pin)
         cs_mask = create_bit_mask(cs_pin)
-
-        # Ensure SCLK and MOSI are low before starting
-        self.current_state &= ~(sclk_mask)
-        self.current_state &= ~(mosi_mask)
-        self.gpio.write(self.current_state)
 
         # Activate chip select (CS low)
         self.current_state &= ~cs_mask
         self.gpio.write(self.current_state)
 
-        bits = self._int_to_bits(data, num_bits)
+        # Prepare the data
+        byte_count = (num_bits + 7) // 8
+        data_bytes = data.to_bytes(byte_count, byteorder='big')
 
         if self.debug:
             print(self._int_to_hex_string(data, num_bits))
 
-        for bit in bits:
-            # Set MOSI
-            if bit:
-                self.current_state |= mosi_mask
-            else:
-                self.current_state &= ~mosi_mask
-            
-            # Write MOSI state (clock is already low)
-            self.gpio.write(self.current_state)
-
-            # Clock high
-            self.current_state |= sclk_mask
-            self.gpio.write(self.current_state)
-
-            # Clock low again (back to idle state)
-            self.current_state &= ~sclk_mask
-            self.gpio.write(self.current_state)
+        # Write data using self.slave
+        self.slave.write(data_bytes, droptail=(8 - num_bits % 8) % 8 if num_bits % 8 != 0 else 0)
 
         # Deactivate chip select (CS high)
         self.current_state |= cs_mask
         self.gpio.write(self.current_state)
 
-        # Reset MOSI and SCLK to low after transmission
-        self.current_state &= ~(sclk_mask)
-        self.gpio.write(self.current_state)
-
-    
     def exchange_spi(self, cs, data, num_bits):
         raise NotImplementedError("This device does not support exchange SPI functionality.")
 
