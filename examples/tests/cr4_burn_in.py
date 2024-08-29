@@ -6,11 +6,11 @@ parent = os.path.dirname(os.path.dirname(current))
 sys.path.append(parent)
 
 from drivers.ftdi_driver import FTDISPIDriver
-from devices.cr4_v4r4 import CR4V4R4
+from devices.cr4_v4r5 import CR4V4R5
 from devices.keysight_e36311a import Keysight_e36311a
 driver = FTDISPIDriver("configs/CR4_V4_FTDI.json", debug=False)
 psu = Keysight_e36311a("configs/CR4_V4_FTDI.json")
-cr4 = CR4V4R4(driver)
+cr4 = CR4V4R5(driver)
 psu.output_disable(1)
 psu.output_disable(2)
 time.sleep(1)

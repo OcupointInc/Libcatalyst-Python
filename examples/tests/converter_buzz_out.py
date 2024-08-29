@@ -6,10 +6,10 @@ parent = os.path.dirname(os.path.dirname(current))
 sys.path.append(parent)
 
 from drivers.ftdi_driver import FTDISPIDriver
-from devices.cr4_v4r4 import CR4V4R4
+from devices.cr4_v4r5 import CR4V4R5
 
 driver = FTDISPIDriver("configs/CR4_V4_FTDI.json", debug=False)
-cr4 = CR4V4R4(driver)
+cr4 = CR4V4R5(driver)
 
 pins = [
     "CS_PRF_IO",

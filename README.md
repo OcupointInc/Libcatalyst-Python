@@ -5,26 +5,28 @@ Libcatalyst-Python is a Python library for interfacing with Ocupoint hardware de
 
 ## Installation and Setup
 
-1. Clone the repository from GitHub.
+1. Clone the repository: https://github.com/OcupointInc/Libcatalyst-Python.git
 2. Install the required dependency 'pyftdi' using pip.
 
 ## Usage
 
-Examples are provided in the main directory of the repository. Currently, you can find 'qc_example.py' which demonstrates basic usage of the library.
+Examples are provided in the main directory of the repository. Currently, you can find 'cr4_tune_sweep.py' which demonstrates basic usage of the library.
 
 ```python
-# QC Example.py
-from devices.queens_canyon import QueensCanyon, QCBank
+# CR4 Example.py
 from drivers.ftdi_driver import FTDISPIDriver
-import time
-from devices.queens_canyon import QueensCanyon
+from devices.cr4_v4r5 import CR4V4R5
 
-driver = FTDISPIDriver("configs/QC_FTDI.json", debug=True) #Prints out the words being written
-qc = QueensCanyon(driver)
+# Enable debug to have it print all registers being written
+driver = FTDISPIDriver("configs/CR4_V4_FTDI.json", debug=False)
+cr4 = CR4V4R5(driver)
 
-for i in range(31):
-    qc.set_attenuation_db(i)
-    time.sleep(1)
+# Define the downconvert PLL LO frequency
+single_convert_freq_mhz = 10000
+
+# Tune the downconvert PLLs
+cr4.tune_pll("D", single_convert_freq_mhz)
+cr4.tune_pll("B", single_convert_freq_mhz)
 ```
 
 ## Configuration
