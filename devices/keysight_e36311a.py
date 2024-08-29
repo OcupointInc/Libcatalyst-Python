@@ -22,11 +22,12 @@ class Keysight_e36311a:
         # Initalize all of the channels
         for channel in self.config["psu"]["channels"]:
             # Check to see if its already on
-            if self.query_output_state(channel["index"]):
-                self.output_disable(channel["index"])
+            #if self.query_output_state(channel["index"]):
+            #    self.output_disable(channel["index"])
 
             self.write_voltage(channel["index"], channel["voltage"])
             self.write_current(channel["index"], channel["current_limit"])
+            continue
             self.output_enable(channel["index"])
             
             time.sleep(0.5)

@@ -23,4 +23,4 @@ words = [word.strip() for word in words]
 for word in words:
     # Assuming the word is a hexadecimal string and needs to be converted to an integer
     spi_word = int(word, 16)
-    driver.write_spi("CS_PRF_IO", spi_word, 24)
+    driver.write_spi("CS_PLL_B", spi_word, 24)

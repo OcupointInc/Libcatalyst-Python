@@ -1,0 +1,19 @@
+{
+    "PLL_MISO": "D2",
+    "SW_BYPASS": "D4",
+    "SW_FILTER": "D5",
+    "MOSI":"D1",
+    "SCLK": "D0",
+    "CS": "D3",
+    "psu": {
+        "resource_id": "USB::10893::4610::MY58491789::0::INSTR",
+        "channels": [
+            {
+                "index": 1,
+                "voltage": 5,
+                "current_limit": 1
+            }
+        ]
+
+    }
+}

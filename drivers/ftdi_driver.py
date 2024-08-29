@@ -4,7 +4,6 @@ from pyftdi.gpio import GpioMpsseController
 from pyftdi.spi import SpiController
 from .interface import DriverInterface
 import json
-import time
 
 # Define the pin mappings
 pin_map = {
@@ -23,7 +22,7 @@ def create_bit_mask(pin_name):
     return mask
 
 class FTDISPIDriver(DriverInterface):
-    def __init__(self, config_file, freq=3E7, id="ftdi://ftdi:ft232h/1", debug=False):
+    def __init__(self, config_file, freq=1E7, id="ftdi://ftdi:ft232h/1", debug=False):
         with open(config_file, 'r') as f:
             self.config = json.load(f)
         # Initialize the FTDI device in MPSSE mode
@@ -49,7 +48,6 @@ class FTDISPIDriver(DriverInterface):
 
         # Set all of the pins to be high by default except the clock pin (idle low)
         self.current_state = 0xFFFF & ~create_bit_mask("D0")
-        self.current_state = 0x0000
         self.gpio.write(self.current_state)
 
         # Calculate delay for SPI clock
@@ -82,6 +80,12 @@ class FTDISPIDriver(DriverInterface):
         self.current_state &= ~cs_mask
         self.gpio.write(self.current_state)
 
+        # Sets all of the DBUS GPIO pins as outputs
+        gpio = self.spi.get_gpio()
+        gpio.set_direction(0xF0, 0xF0)
+        # Writes the states for the gpio pins
+        gpio.write(self.current_state & 0x00F0)
+
         # Prepare the data
         byte_count = (num_bits + 7) // 8
         data_bytes = data.to_bytes(byte_count, byteorder='big')
@@ -95,6 +99,7 @@ class FTDISPIDriver(DriverInterface):
         # Deactivate chip select (CS high)
         self.current_state |= cs_mask
         self.gpio.write(self.current_state)
+        gpio.write(self.current_state & 0x00F0)
 
     def exchange_spi(self, cs, data, num_bits):
         raise NotImplementedError("This device does not support exchange SPI functionality.")
