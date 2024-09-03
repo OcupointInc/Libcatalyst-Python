@@ -1,4 +1,5 @@
 # CR4 V4 R5 Application Note
+## Clock Select & Lock Detection
 ![CR4 V4 R5](assets/CR4V4R5.PNG)
 
 ## Overview
@@ -14,7 +15,7 @@ The Omnetics connector interface on the CR4 V4 R5 supports 1.8V logic levels, en
 A discrete pin for clock selection has been introduced on pin A23 of the Omnetics connector. This pin, labeled **CLCK_SELECT**, allows the user to toggle between the internal and external clock sources:
 
 - **CLCK_SELECT High**: The system uses the internal clock.
-- **CLCK_SELECT Low**: The system switches to the external clock.
+- **CLCK_SELECT Low**: The system switches to the external clock. Connect a differential clock signal on pins A50 and A51
 
 **Note**: Switching to the external clock automatically disables the internal clock to prevent any conflicts or interference.
 
