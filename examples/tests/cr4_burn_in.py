@@ -13,7 +13,7 @@ psu = Keysight_e36311a("configs/CR4_V4_FTDI.json")
 cr4 = CR4V4R5(driver)
 psu.output_disable(1)
 psu.output_disable(2)
-time.sleep(1)
+time.sleep(2)
 
 
 def tune():
@@ -24,8 +24,8 @@ def tune():
     cr4.tune_pll("D", single_convert_freq_mhz)
     cr4.tune_pll("B", single_convert_freq_mhz)
     for pll in cr4.plls.values():
-        pll.set_pll_power("A", 31)
-        pll.set_pll_power("B", 31)
+        pll.set_pll_power("A", 63)
+        pll.set_pll_power("B", 63)
     cr4.set_switch("AB", "single")
     cr4.set_switch("CD", "single")
     cr4.tune_filters(0, 0, 0, 0)
@@ -68,6 +68,7 @@ for i in range(10000):
         raise ValueError("Expect the current to be less than 0.5 amps on 12V")
     
     tune()
+    tune()
 
     
 
@@ -82,11 +83,11 @@ for i in range(10000):
         raise ValueError("Expect the current to be less than 0.5 amps on 12V")
     
     # Keep it on for 2 min
-    time.sleep(5*60)
+    time.sleep(10)
 
     # Turn the power supplies off
     psu.output_disable(1)
     psu.output_disable(2)
 
     # Keep it off for 1 min
-    time.sleep(60)
+    time.sleep(2)

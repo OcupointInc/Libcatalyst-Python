@@ -1,5 +1,2 @@
-spidev
 pyftdi
-pyserial
 pytest
-RPi.GPIO

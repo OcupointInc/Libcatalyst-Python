@@ -16,5 +16,8 @@ def is_locked(driver):
 
 lmx2595 = LMX2595(driver, "CS")
 
+# High for Mixing, low for bypass
 driver.write_gpio_pin("SW_BYPASS", 1)
-driver.write_gpio_pin("SW_FILTER", 1)
+
+# High for high pass filter, low for low pass filter
+driver.write_gpio_pin("SW_FILTER", 0)
