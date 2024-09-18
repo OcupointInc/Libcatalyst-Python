@@ -91,7 +91,7 @@ class FTDISPIDriver(DriverInterface):
         data_bytes = data.to_bytes(byte_count, byteorder='big')
 
         if self.debug:
-            print(self._int_to_hex_string(data, num_bits))
+            print(cs, self._int_to_hex_string(data, num_bits))
 
         # Write data using self.slave
         self.slave.write(data_bytes, droptail=(8 - num_bits % 8) % 8 if num_bits % 8 != 0 else 0)

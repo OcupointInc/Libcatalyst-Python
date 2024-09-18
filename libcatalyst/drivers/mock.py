@@ -28,7 +28,7 @@ class MockDriver(DriverInterface):
         return 0  # Return a mock value
 
     def write_gpio_pin(self, pin_name, value):
-        print(f"GPIO Write: {pin}: {value}")
+        print(f"GPIO Write: {pin_name}: {value}")
 
     def get_pin_name(self, pin):
         return self.config[pin]

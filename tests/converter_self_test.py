@@ -1,14 +1,9 @@
 import time
-import sys
 import os
 from collections import defaultdict
 
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(os.path.dirname(current))
-sys.path.append(parent)
-
-from drivers.ftdi_driver import FTDISPIDriver
-from devices.cr4_v4r5 import CR4V4R5
+from libcatalyst.drivers.ftdi_driver import FTDISPIDriver
+from libcatalyst.devices.CR4V5 import CR4V4R5
 
 sleep_time = 0.0005  # Reduced sleep time
 driver = FTDISPIDriver("configs/CR4_V4_FTDI.json", debug=False)
