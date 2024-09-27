@@ -5,7 +5,7 @@ Libcatalyst-Python is a Python library for interfacing with Ocupoint hardware de
 
 ## Installation and Setup
 
-1. Clone the repository: https://github.com/OcupointInc/Libcatalyst-Python.git
+1. Clone the repository: git clone https://github.com/OcupointInc/Libcatalyst-Python.git
 2. Move into the root directory: cd Libcatalyst-Python
 3. Install the package: pip install -e .
 
