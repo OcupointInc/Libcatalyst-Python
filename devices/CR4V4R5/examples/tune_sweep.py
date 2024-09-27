@@ -47,4 +47,3 @@ cr4.set_attenuation_db([1,2,3,4], 0)
 
 # Tune the filter into bypass mode
 cr4.tune_filters(0, 0, 0, 0)
-input("done")

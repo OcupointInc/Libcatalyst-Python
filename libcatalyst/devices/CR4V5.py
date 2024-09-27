@@ -13,6 +13,10 @@ class CR4V4R5:
         :param driver: An instance of DriverInterface for communication with hardware
         """
         self.driver = driver
+
+        # Set the USB Enable pin high
+        self.driver.set_gpio_direction("USB_ENABLE", 1)
+        self.driver.write_gpio_pin("USB_ENABLE", 1)
         
         # Initialize PLLs (Phase-Locked Loops) A, B, C, and D
         self.plls = {
