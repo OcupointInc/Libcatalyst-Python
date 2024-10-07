@@ -49,3 +49,4 @@ tests/lmx2595.py
 tests/prf_test.py
 tests/spi_words.txt
 tests/spi_write.py
+tests/configs/CR4_V4_FTDI.json
