@@ -27,8 +27,8 @@ class CR4V4R5:
         }
 
         # Set USB_Enable High
-        self.driver.set_gpio_direction("USB_EN", 1)
-        self.driver.write_gpio_pin("USB_EN", 1)
+        self.driver.set_gpio_direction("USB_ENABLE", 1)
+        self.driver.write_gpio_pin("USB_ENABLE", 1)
 
         # Initialize I/O expander, attenuator, and filter
         self.io_expander = MCP23S17T(self.driver, "CS_PRF_IO")

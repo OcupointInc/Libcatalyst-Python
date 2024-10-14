@@ -31,6 +31,7 @@ class FTDISPIDriver(DriverInterface):
         self.ftdi.open_mpsse(vendor=0x0403, product=0x6014, direction=0x0, initial=0x0)
         self.gpio = GpioMpsseController()
         self.spi = SpiController()
+        print(self.ftdi.list_devices())
         self.spi.configure(id)
         self.slave = self.spi.get_port(0, freq, 0)
         self.freq = freq
