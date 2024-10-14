@@ -1,2 +1,3 @@
 pyftdi
 pytest
+tkinter

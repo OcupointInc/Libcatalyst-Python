@@ -22,7 +22,7 @@ def create_bit_mask(pin_name):
     return mask
 
 class FTDISPIDriver(DriverInterface):
-    def __init__(self, config_file, freq=1E7, id="ftdi://ftdi:ft232h/1", debug=False):
+    def __init__(self, config_file, freq=1E6, id="ftdi://ftdi:ft232h/1", debug=False):
         with open(config_file, 'r') as f:
             self.config = json.load(f)
         # Initialize the FTDI device in MPSSE mode

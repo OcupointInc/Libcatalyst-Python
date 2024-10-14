@@ -22,6 +22,10 @@ class CR4V4R5:
             "D": LMX2595(self.driver, "CS_PLL_D"),
         }
 
+        # Set USB_Enable High
+        self.driver.set_gpio_direction("USB_EN", 1)
+        self.driver.write_gpio_pin("USB_EN", 1)
+
         # Initialize I/O expander, attenuator, and filter
         self.io_expander = MCP23S17T(self.driver, "CS_PRF_IO")
         self.attenuator = HMC1018A(self.io_expander, "CS_PRF_IO")

@@ -2,14 +2,15 @@ from setuptools import setup, find_packages
 
 setup(
     name="libcatalyst",
-    version="0.1.0",
+    version="0.1.1",
     description="Python library for interfacing with Ocupoint hardware devices.",
     long_description=open('README.md').read(),
     long_description_content_type="text/markdown",
     url="https://github.com/OcupointInc/Libcatalyst-Python.git",
     packages=find_packages(),  # Automatically find packages in the directory
     install_requires=[
-        'pyftdi'
+        'pyftdi',
+        'tkinter'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

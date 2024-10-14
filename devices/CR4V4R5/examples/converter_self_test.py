@@ -1,19 +1,30 @@
 import time
-import os
+import logging
 from collections import defaultdict
-
 from libcatalyst.drivers.ftdi_driver import FTDISPIDriver
 from libcatalyst.devices.CR4V5 import CR4V4R5
 
 sleep_time = 0.0005  # Reduced sleep time
-driver = FTDISPIDriver("devices/CR4V4R5/configs/CR4_V4_FTDI.json", debug=False)
+
+# Initialize driver and device
+driver = FTDISPIDriver("configs/CR4_V4_FTDI.json", debug=False)
 cr4 = CR4V4R5(driver)
+
 pll_ids = ["D", "C", "B", "A"]
 LO_freq_mhz = 11000
 NUM_TESTS = 500
 
 cr4.set_switch("AB", "single")
 cr4.set_switch("CD", "single")
+
+# Set up logging to handle stdout and flush immediately
+logger = logging.getLogger('pll_load_test')
+logger.setLevel(logging.INFO)
+console_handler = logging.StreamHandler()
+formatter = logging.Formatter('%(message)s')
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
+logger.propagate = False  # Prevent duplicate logs
 
 def reset_all_plls():
     for pll_id in pll_ids:
@@ -24,21 +35,19 @@ def tune_pll(pll_id, LO_freq_mhz):
     time.sleep(sleep_time)
     return cr4.read_is_locked()
 
-def clear_console():
-    os.system('cls' if os.name == 'nt' else 'clear')
-
 def print_current_results(results, current_test, start_time):
-    clear_console()
     elapsed_time = time.time() - start_time
-    print(f"Current Test: {current_test} / {NUM_TESTS}")
-    print(f"Elapsed Time: {elapsed_time:.2f} seconds")
-    print("\nCurrent PLL Success Rates:")
-    print("---------------------------")
+    output = ["__CLEAR_CONSOLE__"]  # Special marker to clear console
+    output.append(f"Current Test: {current_test} / {NUM_TESTS}")
+    output.append(f"Elapsed Time: {elapsed_time:.2f} seconds")
+    output.append("\nCurrent PLL Success Rates:")
+    output.append("---------------------------")
     for pll_id in pll_ids:
         total_attempts = results[pll_id]["total_attempts"]
         successes = results[pll_id]["successes"]
         success_rate = (successes / total_attempts) * 100 if total_attempts > 0 else 0
-        print(f"PLL {pll_id}: {success_rate:.2f}% ({successes}/{total_attempts})")
+        output.append(f"PLL {pll_id}: {success_rate:.2f}% ({successes}/{total_attempts})")
+    logger.info("\n".join(output))
 
 def run_load_test():
     results = defaultdict(lambda: defaultdict(int))
@@ -57,28 +66,30 @@ def run_load_test():
             if success:
                 results[pll_id]["successes"] += 1
 
-            #time.sleep(0.5)
             reset_all_plls()
-        if i % 5 == 0 or i == NUM_TESTS - 1:  # Update every 5 tests or on the last test
+
+        # Update every 10 tests or on the last test
+        if i % 10 == 0 or i == NUM_TESTS - 1:
             print_current_results(results, i + 1, start_time)
 
     return results
 
 def print_final_results(results, total_time):
-    clear_console()
-    print("\nFinal PLL Success Rates:")
-    print("------------------------")
+    output = ["__CLEAR_CONSOLE__"]  # Special marker to clear console
+    output.append("\nFinal PLL Success Rates:")
+    output.append("------------------------")
     for pll_id in pll_ids:
         total_attempts = results[pll_id]["total_attempts"]
         successes = results[pll_id]["successes"]
         success_rate = (successes / total_attempts) * 100 if total_attempts > 0 else 0
-        print(f"PLL {pll_id}: {success_rate:.2f}% ({successes}/{total_attempts})")
-    print(f"\nTotal execution time: {total_time:.2f} seconds")
+        output.append(f"PLL {pll_id}: {success_rate:.2f}% ({successes}/{total_attempts})")
+    output.append(f"\nTotal execution time: {total_time:.2f} seconds")
+    logger.info("\n".join(output))
 
 if __name__ == "__main__":
-    print("Starting PLL load test...")
+    logger.info("Starting PLL load test...")
     start_time = time.time()
     results = run_load_test()
     total_time = time.time() - start_time
     print_final_results(results, total_time)
-    print("Load test completed.")
+    logger.info("Load test completed.")

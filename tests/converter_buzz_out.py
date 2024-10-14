@@ -1,15 +1,15 @@
 from libcatalyst.drivers.ftdi_driver import FTDISPIDriver
 from libcatalyst.devices.CR4V5 import CR4V4R5
 
-driver = FTDISPIDriver("configs/CR4_V4_FTDI.json", debug=False)
+driver = FTDISPIDriver("devices/CR4V4R5/configs/CR4_V4_FTDI.json", debug=False)
 cr4 = CR4V4R5(driver)
 
 pins = [
-    "CS_PRF_IO",
-    #"CS_PLL_D",
-    #"CS_PLL_B",
-    #"CS_PLL_C",
-    #"CS_PLL_A",
+    #"CS_PRF_IO",
+    "CS_PLL_D",
+    "CS_PLL_B",
+    "CS_PLL_C",
+    "CS_PLL_A",
     "MOSI",
     "SCLK"
 ]
