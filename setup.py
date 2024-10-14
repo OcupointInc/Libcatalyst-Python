@@ -10,7 +10,7 @@ setup(
     packages=find_packages(),  # Automatically find packages in the directory
     install_requires=[
         'pyftdi',
-        'tkinter'
+        'tk'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
