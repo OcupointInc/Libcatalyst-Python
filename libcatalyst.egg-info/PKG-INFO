@@ -1,3 +1,16 @@
+Metadata-Version: 2.1
+Name: libcatalyst
+Version: 0.1.0
+Summary: Python library for interfacing with Ocupoint hardware devices.
+Home-page: https://github.com/OcupointInc/Libcatalyst-Python.git
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+
 # Libcatalyst-Python
 
 ## Description
@@ -53,3 +66,4 @@ If you encounter a driver error on Windows, with the FT232 chip, you may need to
 3. Select the FTDI device and set the driver to WinUSB (Or libusb-win32 if WinUSB doesn't work)
 
 After updating the driver, the library should work as expected on Windows systems.
+
