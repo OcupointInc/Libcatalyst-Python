@@ -31,7 +31,6 @@ class FTDISPIDriver(DriverInterface):
         self.ftdi.open_mpsse(vendor=0x0403, product=0x6014, direction=0x0, initial=0x0)
         self.gpio = GpioMpsseController()
         self.spi = SpiController()
-        print(self.ftdi.list_devices())
         self.spi.configure(id)
         self.slave = self.spi.get_port(0, freq, 0)
         self.freq = freq
@@ -118,14 +117,20 @@ class FTDISPIDriver(DriverInterface):
         pin_state = self.gpio.read()[0] & mask
         return bool(pin_state)
     
-    def write_gpio_pin(self, pin, value):
-        mask = create_bit_mask(self._get_pin(pin))
+    def _write_gpio_pin(self, pin, value):
+        mask = create_bit_mask(pin)
         if value:
             self.current_state |= mask
         else:
             self.current_state &= ~mask
         self.gpio.write(self.current_state)
 
+    def write_gpio_pin(self, pin, value):
+        pin = self._get_pin(pin)
+        self._write_gpio_pin(pin, value)
+
+
     def close(self):
         self.gpio.close()
         self.ftdi.close()
+        self.spi.close()

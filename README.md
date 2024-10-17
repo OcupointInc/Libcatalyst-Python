@@ -14,7 +14,7 @@ Libcatalyst-Python is a Python library for interfacing with Ocupoint hardware de
 Examples are provided in each devices example folder. To run an example on the CR4, run the following commands.
 
 1. cd devices/CR4V4R5
-2. python ./examples/tune_sweep.py
+2. python ./cr4_gui.py
 
 # Example Code
 ```python
@@ -29,15 +29,15 @@ cr4 = CR4V4R5(driver)
 # Define the downconvert PLL LO frequency
 single_convert_freq_mhz = 10000
 
-# Tune the downconvert PLLs
-cr4.tune_pll("D", single_convert_freq_mhz)
-cr4.tune_pll("B", single_convert_freq_mhz)
-
 # Set the attenuators to 0 dB attenuation on all 4 channels
 cr4.set_attenuation_db([1,2,3,4], 0)
 
 # Tune the filter into bypass mode
 cr4.tune_filters(0, 0, 0, 0)
+
+# Tune the downconvert PLLs
+cr4.tune_pll("D", single_convert_freq_mhz)
+cr4.tune_pll("B", single_convert_freq_mhz)
 ```
 
 ## Configuration

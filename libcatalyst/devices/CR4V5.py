@@ -47,7 +47,7 @@ class CR4V4R5:
         Set the state of a switch (AB or CD).
         
         :param name: Name of the switch ("AB" or "CD")
-        :param state: State of the switch ("dual" or not)
+        :param state: State of the switch ("dual" or "single")
         """
         if name == "AB" or name == "CD":
             value = 0 if state != "dual" else 1
