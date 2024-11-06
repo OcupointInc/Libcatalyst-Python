@@ -69,8 +69,8 @@ registers = {
 "R48":	0x300300,
 "R47":	0x2F0300,
 "R46":	0x2E07FD,
-"R45":	0x2DC8C0,
-"R44":	0x2C0020,
+"R45":	0x2DC8FF,
+"R44":	0x2C3F60,
 "R43":	0x2B0000,
 "R42":	0x2A0000,
 "R41":	0x290000,
@@ -118,14 +118,16 @@ registers = {
 }
 
 class LMX2595():
-    def __init__(self, driver, cs):
+    def __init__(self, driver, cs, clock_frequency_mhz = 100):
         self.driver = driver
         self.cs = cs
         self.max_freq_mhz = 16000
         self.freq_mhz = 14000
         self.registers = registers
 
+        self.osc_doubler_enabled = True
         self.mash_order = 0 # Integer mode
+        self.osc_freq = clock_frequency_mhz
         self.pfd_dly_sel = 1
         self.pll_n = 70
 
@@ -151,6 +153,13 @@ class LMX2595():
                 # Set the bit at the specified position with the given value
                 self.registers[register] = cleared_value | (bit_value << bit_position)
 
+    def _set_osc_doubler(self):
+        state = 1
+        if self.osc_freq >= 200:
+            state = 1
+        self.osc_doubler_enabled = state
+        self.set_register_bits_with_mask("R9", 0x1000, int(state) << 12)
+
     def unlock(self):
         self.set_register_bits_with_mask("R0", 0x02, 0x02)
         self._write_register("R0")
@@ -161,6 +170,30 @@ class LMX2595():
 
         if port == "B":
             self.set_register_bits_with_mask("R44", 0x100, value << 7)
+
+    def set_osc_freq_mhz(self, freq_mhz):
+        self.osc_freq = freq_mhz
+        self._set_osc_doubler()
+        self._set_ACAL_CMP_DLY()
+
+    def _set_ACAL_CMP_DLY(self):
+        val = math.floor(self.osc_freq / 10)
+        self.set_register_bits_with_mask("R4", 0xFF00, val << 8)
+
+    def _set_FCAL_HPFD_ADJ(self):
+        val = 0
+        freq = self.osc_freq
+        if self.osc_doubler_enabled:
+            freq = self.osc_freq *2
+        if (freq) <= 100:
+            val = 0
+        if 100 < (freq) <= 150:
+            val = 1
+        if 150 <= (freq) <= 200:
+            val = 2
+        if (freq) > 200:
+            val = 4
+        self.set_register_bits_with_mask("R0", 0x180, val << 7)
 
     def set_pll_power(self, port, power):
         if power < 0 or power > 63:
@@ -185,7 +218,7 @@ class LMX2595():
 
     def set_PLL_N(self, freq_mhz):
         reg_id = "R36"
-        pll_n = math.floor(freq_mhz / 200)
+        pll_n = math.floor(freq_mhz / int(self.osc_freq * 2))
         self.registers[reg_id] = 0x240000 + pll_n
         self.set_PFD_DLY_SEL(freq_mhz)
 
@@ -250,8 +283,17 @@ class LMX2595():
     def tune(self, freq_mhz):
         if freq_mhz > self.max_freq_mhz or freq_mhz < 0:
             raise ValueError(f"PLL Frequency must be between 0 and {self.max_freq} dB (inclusive).")
+        
+        if freq_mhz % self.osc_freq != 0:
+            raise ValueError(f"Currently only supports integer mode. Output frequency must be a multiple of the clock frequency: {self.osc_freq}")
+
+        if freq_mhz == 0:
+            self.reset_enable(1)
+            return
 
         self.reset_enable(0)
+
+
 
         self.set_PLL_N(freq_mhz)
 

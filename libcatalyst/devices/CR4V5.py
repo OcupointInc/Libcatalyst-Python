@@ -6,13 +6,14 @@ from libcatalyst.sensors.rf_filters.ADMV8818 import ADMV8818
 from libcatalyst.drivers.interface import DriverInterface
 
 class CR4V4R5:
-    def __init__(self, driver: DriverInterface):
+    def __init__(self, driver: DriverInterface, clock_frequency_mhz = 100):
         """
         Initialize the CR4V4R5 class with various components.
         
         :param driver: An instance of DriverInterface for communication with hardware
         """
         self.driver = driver
+        self.clock_freq_mhz = clock_frequency_mhz
 
         # Set the USB Enable pin high
         self.driver.set_gpio_direction("USB_ENABLE", 1)
@@ -55,6 +56,10 @@ class CR4V4R5:
         else:
             raise ValueError("Switch name needs to be AB or CD")
         
+    def set_clock_frequency(self, freq_mhz):
+        for pll in self.plls.values():
+            pll.set_osc_freq_mhz(freq_mhz)
+        
     def set_clock_select(self, val):
         """
         Set the clock select to either internal or external.
@@ -85,7 +90,7 @@ class CR4V4R5:
         # lpf_switch and hpf_switch: 0-3, lpf_band and hpf_band: 0-15
         self.filter.tune(lpf_switch, lpf_band, hpf_switch, hpf_band)
 
-    def set_attenuation_db(self, channels, attenuation):
+    def set_attenuation_db(self, channels, attenuation_db):
         """
         Sets the attenuation in dB for specified channels.
 
@@ -109,7 +114,7 @@ class CR4V4R5:
         # Set the other CS pins high
         self.io_expander.write_bank_state("B", 0x3C)
         # Set the attenuation
-        self.attenuator.set_attenuation_db(attenuation)
+        self.attenuator.set_attenuation_db(attenuation_db)
 
     def tune_pll(self, pll_name, frequency_mhz):
         """
@@ -135,6 +140,27 @@ class CR4V4R5:
         :param pll_name: Name of the PLL to power up
         """
         self.plls[pll_name].power_up()
+
+    def reset_all_plls(self):
+        """
+        Put all PLLs into reset mode.
+        
+        :param pll_name: Name of the PLL
+        :param state: Boolean indicating whether to enable (True) or disable (False) reset
+        """
+        for pll in self.plls.values():
+            pll.reset_enable(1)
+
+    def set_pll_power(self, value):
+        """
+        Put all PLLs into reset mode.
+        
+        :param pll_name: Name of the PLL
+        :param state: Boolean indicating whether to enable (True) or disable (False) reset
+        """
+        for pll in self.plls.values():
+            pll.set_pll_power("A", value)
+            pll.set_pll_power("B", value)
 
     def pll_reset_enable(self, pll_name, state):
         """

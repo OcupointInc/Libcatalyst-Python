@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-setup(
+setup(  
     name="libcatalyst",
     version="0.1.1",
     description="Python library for interfacing with Ocupoint hardware devices.",
