@@ -43,6 +43,9 @@ class CR4V4R5:
         # Set default clock select to internal
         self.set_clock_select("internal")
 
+        #
+        self.set_clock_frequency(self.clock_freq_mhz)
+
     def set_switch(self, name, state):
         """
         Set the state of a switch (AB or CD).
