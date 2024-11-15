@@ -71,8 +71,15 @@ class FTDISPIDriver(DriverInterface):
         hex_length = (length + 3) // 4  # Each hex digit represents 4 bits
         # Convert integer to hexadecimal string and pad with leading zeros
         return "0x" + format(num, f'0{hex_length}x').upper()
-
+        
     def write_spi(self, cs, data, num_bits):
+        # Validate num_bits and data size
+        if num_bits > 32:
+            raise ValueError("num_bits exceeds maximum supported bit length (32).")
+        if data >= (1 << num_bits):
+            raise ValueError(f"Data {data:#X} exceeds the specified bit-width {num_bits}.")
+
+        # Chip Select (CS) handling
         cs_pin = self._get_pin(cs)
         cs_mask = create_bit_mask(cs_pin)
 
@@ -80,25 +87,29 @@ class FTDISPIDriver(DriverInterface):
         self.current_state &= ~cs_mask
         self.gpio.write(self.current_state)
 
-        # Sets all of the DBUS GPIO pins as outputs
+        # Configure GPIO as outputs
         gpio = self.spi.get_gpio()
         gpio.set_direction(0xF0, 0xF0)
-        # Writes the states for the gpio pins
         gpio.write(self.current_state & 0x00F0)
 
-        # Prepare the data
+        # Prepare data for SPI transfer
         byte_count = (num_bits + 7) // 8
         data_bytes = data.to_bytes(byte_count, byteorder='big')
 
-        if self.debug:
-            print(cs, self._int_to_hex_string(data, num_bits))
+        # Calculate droptail for non-multiple-of-8 num_bits
+        bits_to_drop = (8 - (num_bits % 8)) % 8
 
-        # Write data using self.slave
-        self.slave.write(data_bytes, droptail=(8 - num_bits % 8) % 8 if num_bits % 8 != 0 else 0)
+        if self.debug:
+            print(f"CS Pin: {cs}, Data: {self._int_to_hex_string(data, num_bits)}, Num Bits: {num_bits}")
+
+        # Write data using SPI slave
+        self.slave.write(data_bytes, droptail=bits_to_drop)
 
         # Deactivate chip select (CS high)
         self.current_state |= cs_mask
         self.gpio.write(self.current_state)
+        gpio.write(self.current_state & 0x00F0)
+
         gpio.write(self.current_state & 0x00F0)
 
     def exchange_spi(self, cs, data, num_bits):
