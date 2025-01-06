@@ -1,0 +1,7 @@
+{
+    "MOSI":"D1",
+    "SCLK": "D0",
+    "CS": "D3",
+    "SW_BYPASS": "D7",
+    "SW_FILTER": "D6"
+}

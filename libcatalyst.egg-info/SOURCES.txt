@@ -7,7 +7,6 @@ devices/CR4V4R5/CR4V4R5_Application_Note.md
 devices/CR4V4R5/CR4_V4_R5_Mechanical_ICD.pdf
 devices/CR4V4R5/assets/CR4V4R5.PNG
 devices/CR4V4R5/configs/CR4_V4_FTDI.json
-devices/CR4V4R5/examples/tune_sweep.py
 libcatalyst.egg-info/PKG-INFO
 libcatalyst.egg-info/SOURCES.txt
 libcatalyst.egg-info/dependency_links.txt

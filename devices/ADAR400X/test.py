@@ -7,6 +7,6 @@ driver = FTDISPIDriver("configs/ADAR400X_FTDI.json", debug=True)
 
 adar = ADAR400X(driver, "CS", 0)
 
-adar.load_file("./sleep.csv")
+adar.load_file("./output.csv")
 
-adar.sleep_mode()
+#adar.sleep_mode()

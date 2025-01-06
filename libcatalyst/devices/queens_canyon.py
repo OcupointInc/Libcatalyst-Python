@@ -1,6 +1,6 @@
 # QC.py
-from sensors.digital_attenuators.ADRF5720 import ADRF5720
-from drivers.interface import DriverInterface
+from libcatalyst.sensors.digital_attenuators.ADRF5720 import ADRF5720
+from libcatalyst.drivers.interface import DriverInterface
 from enum import Enum
 
 class QCBank(Enum):
