@@ -1,3 +1,0 @@
-pyftdi
-pytest
-tkinter
