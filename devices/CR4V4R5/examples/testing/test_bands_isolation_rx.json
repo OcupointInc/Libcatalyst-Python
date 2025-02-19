@@ -1,0 +1,108 @@
+{
+    "bands": [
+        {
+            "name": "2-4GHz_Bypass",
+            "switch_mode": "dual",
+            "input_level_dbm": -35,
+            "attenuation_db": 0,
+            "filter_settings": [0,0,0,0],
+            "rf_center_mhz": 3000,
+            "if_center_mhz": 3000,
+            "ibw_freq_mhz": 2000,
+            "lo_freq_mhz_downconvert": 12000,
+            "lo_freq_mhz_upconvert": 12000,
+            "min_gain_db": 28
+        },
+        {
+            "name": "4-6GHz_Bypass",
+            "switch_mode": "dual",
+            "input_level_dbm": -35,
+            "attenuation_db": 0,
+            "filter_settings": [0,0,0,0],
+            "rf_center_mhz": 3000,
+            "if_center_mhz": 3000,
+            "ibw_freq_mhz": 2000,
+            "lo_freq_mhz_downconvert": 14000,
+            "lo_freq_mhz_upconvert": 12000,
+            "min_gain_db": 15
+        },
+        {
+            "name": "6-8GHz_Bypass",
+            "switch_mode": "single",
+            "input_level_dbm": -35,
+            "attenuation_db": 0,
+            "filter_settings": [0,0,0,0],
+            "rf_center_mhz": 3000,
+            "if_center_mhz": 3000,
+            "ibw_freq_mhz": 2000,
+            "lo_freq_mhz_downconvert": 10000,
+            "lo_freq_mhz_upconvert": 0,
+            "min_gain_db": 15
+        },
+        {
+            "name": "8-10GHz_Bypass",
+            "switch_mode": "single",
+            "input_level_dbm": -35,
+            "attenuation_db": 0,
+            "filter_settings": [0,0,0,0],
+            "rf_center_mhz": 3000,
+            "if_center_mhz": 3000,
+            "ibw_freq_mhz": 2000,
+            "lo_freq_mhz_downconvert": 12000,
+            "lo_freq_mhz_upconvert": 0,
+            "min_gain_db": 15
+        },
+        {
+            "name": "10-12GHz_Bypass",
+            "switch_mode": "single",
+            "input_level_dbm": -35,
+            "attenuation_db": 0,
+            "filter_settings": [0,0,0,0],
+            "rf_center_mhz": 3000,
+            "if_center_mhz": 3000,
+            "ibw_freq_mhz": 2000,
+            "lo_freq_mhz_downconvert": 14000,
+            "lo_freq_mhz_upconvert": 0,
+            "min_gain_db": 15
+        },
+        {
+            "name": "12-14GHz_Bypass",
+            "switch_mode": "single",
+            "input_level_dbm": -35,
+            "attenuation_db": 0,
+            "filter_settings": [0,0,0,0],
+            "rf_center_mhz": 3000,
+            "if_center_mhz": 3000,
+            "ibw_freq_mhz": 2000,
+            "lo_freq_mhz_downconvert": 10000,
+            "lo_freq_mhz_upconvert": 0,
+            "min_gain_db": 15
+        },
+        {
+            "name": "14-16GHz_Bypass",
+            "switch_mode": "single",
+            "input_level_dbm": -35,
+            "attenuation_db": 0,
+            "filter_settings": [0,0,0,0],
+            "rf_center_mhz": 3000,
+            "if_center_mhz": 3000,
+            "ibw_freq_mhz": 2000,
+            "lo_freq_mhz_downconvert": 12000,
+            "lo_freq_mhz_upconvert": 0,
+            "min_gain_db": 15
+        },
+        {
+            "name": "16-18GHz_Bypass",
+            "switch_mode": "single",
+            "input_level_dbm": -35,
+            "attenuation_db": 0,
+            "filter_settings": [0,0,0,0],
+            "rf_center_mhz": 3000,
+            "if_center_mhz": 3000,
+            "ibw_freq_mhz": 2000,
+            "lo_freq_mhz_downconvert": 14000,
+            "lo_freq_mhz_upconvert": 0,
+            "min_gain_db": 15
+        }
+    ]
+}

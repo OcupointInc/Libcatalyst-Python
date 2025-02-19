@@ -45,7 +45,7 @@ class ADMV8818():
             raise ValueError("HPF band setting needs to be from 0 to 4")
 
         # Combine all parts into a single 24-bit word
-        combined_word = (address << 8) | (sw_write << 6) | (lpf_band << 3) | (hpf_band)
+        combined_word = (address << 8) | (sw_write << 6) | (hpf_band << 3) | (lpf_band)
         
         self.driver.write_spi(self.cs, combined_word, 24)
         return combined_word
@@ -70,7 +70,7 @@ class ADMV8818():
             raise ValueError("HPF band setting needs to be from 0 to 15")
 
         # Combine all parts into a single 24-bit word
-        combined_word = (address << 8) | (lpf_band << 4) | (hpf_band)
+        combined_word = (address << 8) | (hpf_band << 4) | (lpf_band)
         
         self.driver.write_spi(self.cs, combined_word, 24)
         return combined_word

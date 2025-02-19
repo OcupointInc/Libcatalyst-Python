@@ -1,4 +1,57 @@
 import easy_scpi as scpi
+import time
+
+class Marker():
+    def __init__(self, instrument, id) -> None:
+        self.id = str(id)
+        self.instrument = instrument
+        self._freq_mhz = 0
+        self.level_dbm = -100
+
+    def get_peak(self):
+        self.write("CALC:MARK:SEL " + self.id)
+        self.write("CALC:MARK:SEL " + self.id)
+        self.write("CALC:MARK:MAX")
+        self.write("CALC:MARK:MAX")
+        #self.get_freq_mhz()
+        #self.get_freq_mhz()
+        self.get_level_dbm()
+        self.get_level_dbm()
+        return self.freq_mhz, self.level_dbm
+    
+    def get_next_peak(self):
+        self.write("CALCULATE:MARKER:UPDATE ON")
+        self.write("CALC:MARK:MAX:next")
+        next_peak_freq = self.instrument.query("CALC:MARK:X?")
+        self.get_level_dbm()
+        self.get_level_dbm()
+        return next_peak_freq, self.level_dbm
+
+
+    def get_freq_mhz(self):
+        self.write("CALC:MARK:SEL " + self.id)
+        self.freq_mhz = float(self.instrument.query("CALC:MARK:X?")) * 1e-6
+        return self.freq_mhz
+
+    def write(self, msg):
+        self.instrument.write(msg)
+
+    def get_level_dbm(self):
+        self.write("CALC:MARK:SEL " + self.id)
+        self.level_dbm = float(self.instrument.query("CALC:MARK:Y?"))
+        return self.level_dbm
+
+    @property
+    def freq_mhz(self):
+        return self._freq_mhz
+
+    @freq_mhz.setter
+    def freq_mhz(self, value):
+        self._freq_mhz = value
+        self.write("CALC:MARK:SEL " + self.id)
+        cmd = "CALC:MARK:X " + str(value * 1e6)
+        self.get_level_dbm()
+        self.write(cmd)
 
 class SpectrumAnalyser():
     def __init__(self, id) -> None:
@@ -68,7 +121,7 @@ class SpectrumAnalyser():
 
     def trigger_sweep(self):
         self.write("INIT:IMM")
-        time.sleep(self.sweep_time_s * self.sweep_count)
+        #time.sleep(self.sweep_time_s * 100)
 
     @property
     def sweep_continious(self):

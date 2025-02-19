@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "libcatalyst"
+version = "0.1.2"
+description = "Python library for interfacing with Ocupoint hardware devices."
+readme = "README.md"
+requires-python = ">=3.6"
+license = {text = "MIT"}
+authors = [
+    {name = "Eugene Pentland", email = "epentland@ocupoint.com"}
+]
+dependencies = [
+    "pyftdi",
+    "tk"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+
+[project.urls]
+Homepage = "https://github.com/OcupointInc/Libcatalyst-Python.git"
+
+# Point setuptools to the src/ directory
+[tool.setuptools.packages.find]
+where = ["src"]

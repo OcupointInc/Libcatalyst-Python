@@ -1,9 +1,3 @@
-import sys
-import os
-
-# Add the project root to sys.path
-sys.path.append(os.path.dirname(os.path.abspath("/home/ocupoint/Libcatalyst-Python/libcatalyst/devices/CR4V5.py")))
-
 from libcatalyst.drivers.ftdi_driver import FTDISPIDriver
 from libcatalyst.devices.CR4V5 import CR4V4R5
 

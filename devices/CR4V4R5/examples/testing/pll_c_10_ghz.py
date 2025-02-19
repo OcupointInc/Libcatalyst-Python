@@ -14,7 +14,7 @@ pll_b_frequency_mhz  = 0
 pll_d_frequency_mhz  = 0
 
 pll_a_frequency_mhz  = 0
-pll_c_frequency_mhz  = 10000
+pll_c_frequency_mhz  = 0
 
 sw_ab_state = "single"
 sw_cd_state = "single"

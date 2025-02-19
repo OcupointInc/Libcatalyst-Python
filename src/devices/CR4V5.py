@@ -27,6 +27,11 @@ class CR4V4R5:
             "D": LMX2595(self.driver, "CS_PLL_D"),
         }
 
+        # Set output power to 0 for all of them
+        for pll in self.plls.values():
+            pll.set_pll_power("A", 0)
+            pll.set_pll_power("B", 0)
+
         # Set USB_Enable High
         self.driver.set_gpio_direction("USB_ENABLE", 1)
         self.driver.write_gpio_pin("USB_ENABLE", 1)
@@ -71,7 +76,7 @@ class CR4V4R5:
         """
         self.driver.write_gpio_pin("CLK_SEL", True if val == "internal" else False)
 
-    def tune_filters(self, lpf_switch, lpf_band, hpf_switch, hpf_band):
+    def tune_filters(self, channels, lpf_switch, lpf_band, hpf_switch, hpf_band):
         """
         Tune the low-pass and high-pass filters with given parameters.
         
@@ -81,8 +86,16 @@ class CR4V4R5:
         :param hpf_band: High-pass filter band selection (integer from 0 to 15)
         """
         # Configure I/O expander for filter tuning
+        cs_mask = 0x30
+        if channels == [1, 2]:
+            cs_mask = 0x10
+        if channels == [3, 4]:
+            cs_mask = 0x20
+        if channels == [1,2,3,4]:
+            cs_mask = 0x30
+
         self.io_expander.spi_bank = "B"
-        self.io_expander.cs_mask = 0x30
+        self.io_expander.cs_mask = cs_mask # CS 1&2 are 0x10, CS 3&4 are 0x20, 0x30 is all channels
         self.io_expander.sclk_pin = 0x04
         self.io_expander.mosi_pin = 0x08
         
