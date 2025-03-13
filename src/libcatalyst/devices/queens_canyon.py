@@ -16,10 +16,10 @@ class QueensCanyon:
         self.attenuators = ADRF5720(self.driver, "attenuator_cs")
 
         self.bypass_switch = self._setup_gpio_pin("bypass_switch_gpio", 1)
-        self.v1_in = self._setup_gpio_pin("v1_in_gpio", 1)
-        self.v2_in = self._setup_gpio_pin("v2_in_gpio", 1)
-        self.v1_out = self._setup_gpio_pin("v1_out_gpio", 1)
-        self.v2_out = self._setup_gpio_pin("v2_out_gpio", 1)
+        self.v1_1 = self._setup_gpio_pin("v1_1_gpio", 1)
+        self.v2_1 = self._setup_gpio_pin("v2_1_gpio", 1)
+        self.v1_2 = self._setup_gpio_pin("v1_2_gpio", 1)
+        self.v2_2 = self._setup_gpio_pin("v2_2_gpio", 1)
 
     def set_attenuation_db(self, attenuation):
         """
@@ -60,28 +60,28 @@ class QueensCanyon:
         """
         # Bypass Mode
         if value == QCBank.Bypass:
-            self.driver.write_gpio_pin(self.v1_in, 1)
-            self.driver.write_gpio_pin(self.v2_in, 1)
-            self.driver.write_gpio_pin(self.v1_out, 0)
-            self.driver.write_gpio_pin(self.v2_out, 1)
+            self.driver.write_gpio_pin(self.v1_1, 1)
+            self.driver.write_gpio_pin(self.v2_1, 1)
+            self.driver.write_gpio_pin(self.v1_2, 0)
+            self.driver.write_gpio_pin(self.v2_2, 1)
         # LPF 0.5 GHz
         elif value == QCBank.LPF_0p5GHz:
-            self.driver.write_gpio_pin(self.v1_in, 0)
-            self.driver.write_gpio_pin(self.v2_in, 1)
-            self.driver.write_gpio_pin(self.v1_out, 1)
-            self.driver.write_gpio_pin(self.v2_out, 1)
+            self.driver.write_gpio_pin(self.v1_1, 0)
+            self.driver.write_gpio_pin(self.v2_1, 1)
+            self.driver.write_gpio_pin(self.v1_2, 1)
+            self.driver.write_gpio_pin(self.v2_2, 1)
         # LPF 1 GHz
         elif value == QCBank.LPF_1GHz:
-            self.driver.write_gpio_pin(self.v1_in, 1)
-            self.driver.write_gpio_pin(self.v2_in, 0)
-            self.driver.write_gpio_pin(self.v1_out, 0)
-            self.driver.write_gpio_pin(self.v2_out, 0)
+            self.driver.write_gpio_pin(self.v1_1, 1)
+            self.driver.write_gpio_pin(self.v2_1, 0)
+            self.driver.write_gpio_pin(self.v1_2, 0)
+            self.driver.write_gpio_pin(self.v2_2, 0)
         # LPF 2 GHz
         elif value == QCBank.LPF_2GHz:
-            self.driver.write_gpio_pin(self.v1_in, 0)
-            self.driver.write_gpio_pin(self.v2_in, 0)
-            self.driver.write_gpio_pin(self.v1_out, 1)
-            self.driver.write_gpio_pin(self.v2_out, 0)
+            self.driver.write_gpio_pin(self.v1_1, 0)
+            self.driver.write_gpio_pin(self.v2_1, 0)
+            self.driver.write_gpio_pin(self.v1_2, 1)
+            self.driver.write_gpio_pin(self.v2_2, 0)
         else:
             raise ValueError("Invalid filter bank value. Must be a valid QCBank enum value.")
 
