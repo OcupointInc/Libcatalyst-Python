@@ -1,0 +1,12 @@
+{
+    "CS_IO0": "D5",
+    "CS_IO1": "C2",
+    "CS_IO2": "D3",
+    "CS_IO3": "D4",
+    "CS_IO4": "C1",
+    "CS_IO5": "D6",
+    "CS_IO6":"C3",
+    "MOSI": "D1",
+    "SCLK": "D0",
+    "MISO": "D2"
+}
